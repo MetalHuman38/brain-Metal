@@ -127,7 +127,7 @@ const loginUser = async (req, res) => {
 exports.loginUser = loginUser;
 function getCurrentUser(req, res) {
     try {
-        const token = req.headers.authorization?.split(' ')[1];
+        const token = req.cookies.accessToken;
         if (!token) {
             res.status(401).json({ message: 'Unauthrized: No Token provided' });
             return;
