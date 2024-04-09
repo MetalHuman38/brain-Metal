@@ -1,0 +1,8 @@
+CREATE TABLE Saves (
+    SaveID INT PRIMARY KEY AUTO_INCREMENT,
+    UserID INT,
+    PostID INT,
+    SaveDateTime DATETIME,
+    FOREIGN KEY (UserID) REFERENCES Users(UserID),
+    FOREIGN KEY (PostID) REFERENCES Posts(PostID)
+);
