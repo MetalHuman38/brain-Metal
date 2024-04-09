@@ -30,4 +30,5 @@ yarn-error.log
 .tailwind/
 
 # include .env file
-.env
+*
+!.env
