@@ -1,3 +1,6 @@
+# include .env file
+*.env
+
 # Logs
 logs/
 *.log
@@ -29,6 +32,3 @@ yarn-error.log
 # Tailwind CSS
 .tailwind/
 
-# include .env file
-*
-!.env
