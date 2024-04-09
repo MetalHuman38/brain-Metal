@@ -37,3 +37,6 @@ yarn-error.log
 # Target all directories
 */
 
+# add .env file
+.env
+
