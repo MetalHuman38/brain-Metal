@@ -149,6 +149,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         Username: user.Username,
         Email: user.Email,
         ImageUrl: user.ImageURL,
+        AvatarUrl: user.AvatarUrl,
         Bio: user.Bio || '',
       },
     };

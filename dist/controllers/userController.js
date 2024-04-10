@@ -114,6 +114,7 @@ const loginUser = async (req, res) => {
                 Username: user.Username,
                 Email: user.Email,
                 ImageUrl: user.ImageURL,
+                AvatarUrl: user.AvatarUrl,
                 Bio: user.Bio || '',
             },
         };

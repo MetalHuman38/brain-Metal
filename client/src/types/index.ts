@@ -32,12 +32,13 @@ export type INavLink = {
   };
   
   export type IUser = {
-    id: string;
-    name: string;
-    username: string;
-    email: string;
-    imageUrl: string;
-    bio: string;
+    UserID: string;
+    MemberName: string;
+    Username: string;
+    Email: string;
+    ImageUrl: string;
+    AvatarUrl: string;
+    Bio: string;
   };
   
   export type INewUser = {

@@ -12,6 +12,7 @@
 //   register: (values: { name: string; username: string; email: string; password: string }) => Promise<void>;
 //   updateUser: (values: IUpdateUser) => Promise<void>;
 //   isUserLoading?: boolean;
+//   isSuccess?: boolean;
 //   isAuthenticated: () => boolean;
 // };
 
@@ -23,6 +24,7 @@
 //   register: async () => {},
 //   updateUser: async () => {},
 //   isUserLoading: false,
+//   isSuccess: false,
 //   isAuthenticated: () => false,
 // });
 
@@ -47,20 +49,21 @@
 //         .catch((error) => {console.error('Error getting current user:', error);
 //          setUser(null);
 //          localStorage.removeItem("token");
-//           delete axios.defaults.headers.common["Authorization"];
+//          delete axios.defaults.headers.common["Authorization"];
 //       });
 //     } else {
 //       setUser(null);
 //     }
 //   }, []);
 
-
 //   async function login(values: { email: string; password: string }) {
 //     try {
 //     const response = await axios.post("http://localhost:3000/api/login", values);
-//     const { user, token } = response.data;
+//     const { tokenResponse } = response.data;
+//     const { user, token } = tokenResponse;
+//     localStorage.setItem("tokenResponse", JSON.stringify(tokenResponse)); 
 //     setUser(user);
-//     localStorage.setItem("token", token);
+//     localStorage.setItem("accessToken", token);
 //     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 //     navigate("/");
 //   } catch (error) {
@@ -104,6 +107,7 @@ import { IUpdateUser, IUser } from "@/types";
 import axios from "axios";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "react-query";
 
 
 // 1. Define the AuthContext type.
@@ -114,7 +118,9 @@ type AuthContextType = {
   register: (values: { name: string; username: string; email: string; password: string }) => Promise<void>;
   updateUser: (values: IUpdateUser) => Promise<void>;
   isUserLoading?: boolean;
+  isSuccess?: boolean;
   isAuthenticated: () => boolean;
+  setisUserLoading: (value: boolean) => void;
 };
 
 // 2. Create the AuthContext.
@@ -125,14 +131,18 @@ const AuthContext = createContext<AuthContextType>({
   register: async () => {},
   updateUser: async () => {},
   isUserLoading: false,
+  isSuccess: false,
   isAuthenticated: () => false,
+  setisUserLoading: () => {},
 });
 
 // 3. Create an AuthProvider component.
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<IUser | null>(null);
+  const [isUserLoading, setisUserLoading] = useState(false);
   const navigate = useNavigate();
-
+  
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -141,16 +151,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("accessToken");
     if (token) {
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      setisUserLoading(true);
       axios.get("http://localhost:3000/api/getCurrentUser")
         .then((response) => {setUser(response.data);})
-        .catch((error) => {console.error('Error getting current user:', error);
-         setUser(null);
-         localStorage.removeItem("token");
-         delete axios.defaults.headers.common["Authorization"];
-      });
+        .catch((error) => {
+          console.error('Error getting current user:', error);
+          setUser(null);
+          localStorage.removeItem("accessToken");
+          delete axios.defaults.headers.common["Authorization"];
+        })
+        .finally(() => {
+          setisUserLoading(false);
+        });
     } else {
       setUser(null);
     }
@@ -161,6 +176,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const response = await axios.post("http://localhost:3000/api/login", values);
     const { tokenResponse } = response.data;
     const { user, token } = tokenResponse;
+    localStorage.setItem("tokenResponse", JSON.stringify(tokenResponse)); 
     setUser(user);
     localStorage.setItem("accessToken", token);
     axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -192,7 +208,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, updateUser, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, register, updateUser, isAuthenticated, setisUserLoading }}>
       {children}
     </AuthContext.Provider>
   );
