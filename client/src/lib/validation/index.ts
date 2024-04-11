@@ -13,3 +13,11 @@ export const SignInValidation = z.object({
   email: z.string().email(),
   password: z.string().min(8, { message: "Password Must be atleast 8 characters."}),
 })
+
+// Contains all the form validation rules.
+export const PostValidation = z.object({
+  caption: z.string().min(2, { message: "Too short"}).max(100),
+  file: z.custom<File[]>(),
+  location: z.string().min(2, { message: "Too short"}).max(50),
+  tags: z.string().min(2, { message: "Too short"}).max(50),
+})

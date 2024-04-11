@@ -2,7 +2,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { useEffect, useState } from 'react';
 import { useUserContext } from '@/lib/context/AuthContext';
-import axios from 'axios';
 
 
 const TopBar = () => {

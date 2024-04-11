@@ -1,48 +1,41 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { createSequelizeInstance } from './sequelizeCon';
+import Users from './UserModel';
 
-interface PostAttributes {
+interface NewPostAttributes {
   PostID: number;
   CreatorID: number | null;
-  Likes: number | null;
+  File: [] | null;
   Caption: string;
   Tags: string;
-  ImageURL: string | null;
   Location: string | null;
   CreatedAt: Date | undefined;
-  UpdatedAt: Date | undefined;
-  
 }
 
-interface PostCreationAttributes extends Optional<PostAttributes, 'PostID'> {}
+interface NewPostCreationAttributes extends Optional<NewPostAttributes, 'PostID'> {}
 
 // Define Instance of Sequelize
 const sequelize = createSequelizeInstance();
 
-class Posts extends Model<PostAttributes, PostCreationAttributes> implements PostAttributes {
+class NewPosts extends Model<NewPostAttributes, NewPostCreationAttributes> implements NewPostAttributes {
   public PostID!: number;
   public CreatorID!: number | null;
-  public Likes!: number | null;
-  public Caption!: string;    
+  public Caption!: string;
+  public File!: [] | null;    
   public Tags!: string;
-  public ImageURL!: string | null;
   public Location!: string | null;
   public CreatedAt: Date | undefined;
-  public UpdatedAt: Date | undefined;
 
-  static async findAllUserPosts(creatorID: number): Promise<Posts[]> {
-    return await this.findAll({
-      where: {
-        CreatorID: creatorID
-      },
-      order: [['CreatedAt', 'DESC']],
-      limit: 10
-    });
+  
+  // Create custom class methods to create a new post
+  static async createPost(attributes: NewPostCreationAttributes): Promise<NewPosts> {
+    return await this.create(attributes);
   }
+
 }
 
 // Define the User model
-Posts.init(
+NewPosts.init(
   {
     PostID: {
       type: DataTypes.INTEGER,
@@ -55,24 +48,19 @@ Posts.init(
         allowNull: true,
       },
 
-      Likes: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-
       Caption: {
         type: DataTypes.STRING,
         allowNull: false,
       },
 
-      Tags: {
-        type: DataTypes.STRING,
-        allowNull: false,
+      File: {
+        type: DataTypes.ARRAY(DataTypes.STRING),
+        allowNull: true,
       },
 
-      ImageURL: {
-        type: DataTypes.STRING,
-        allowNull: true,
+      Tags: {
+        type: DataTypes.TEXT,
+        allowNull: false,
       },
 
       Location: {
@@ -85,21 +73,21 @@ Posts.init(
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
-      
-      UpdatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
     },
 {
     sequelize,
-    tableName: 'Posts',
-    updatedAt: 'UpdatedAt',
+    tableName: 'NewPosts',
     createdAt: 'CreatedAt',
     timestamps: false
 }
 );
 
+// Create foreign key relationship
+NewPosts.belongsTo(Users, {
+  foreignKey: 'CreatorID',
+  targetKey: 'UserID',
+  as: 'creator'
+});
 
-export default Posts;
+
+export default NewPosts;

@@ -20,6 +20,8 @@ export const theme = {
     colors: {
       'primary-500': '#EBEBD3',
       'primary-600': '#5D5FEF',
+      'primary-700': '#1E1E24',
+      'primary-400': '#1F2232',
       'secondary-500': '#FFB620',
       'off-white': '#D0DFFF',
       'red': '#FF5A5A',

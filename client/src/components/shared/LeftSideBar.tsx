@@ -3,9 +3,10 @@ import { useUserContext } from '@/lib/context/AuthContext';
 import { INavLink } from '@/types';
 import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation } from 'react-router-dom';
+import { Button } from '../ui/button';
 
 const LeftSideBar = () => {
-  const { setisUserLoading, isUserLoading } = useUserContext();
+  const { logout, setisUserLoading, isUserLoading } = useUserContext();
   const [userData, setUserData] = useState(null);
   const { pathname } = useLocation();
 
@@ -46,7 +47,7 @@ const LeftSideBar = () => {
               const isActive = pathname === link.route;
                return(
                 <li key={link.label}
-                   className={`leftsidebar-link group ${ isActive && 'bg-primary-500'}`}>
+                   className={`leftsidebar-link group ${ isActive && 'bg-primary-700'}`}>
                    <NavLink to={link.route} 
                             className="flex gap-4 items-center p-4">
                             <img src={link.imgURL} 
@@ -60,8 +61,14 @@ const LeftSideBar = () => {
                )
             })}
         </ul>
-
       </div>
+      <Button variant="ghost" 
+              className="shad-button_ghost" 
+              onClick={() => logout()}>
+            <img src="/assets/icons/logout.svg" 
+              alt="logout" />
+            <p className='small-medium lg:base-medium'>Logout</p>
+      </Button>
     </nav>
   );
 };
