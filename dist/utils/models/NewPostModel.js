@@ -28,10 +28,10 @@ NewPosts.init({
     },
     Caption: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
-    File: {
-        type: sequelize_1.DataTypes.ARRAY(sequelize_1.DataTypes.STRING),
+    ImageURL: {
+        type: sequelize_1.DataTypes.STRING,
         allowNull: true,
     },
     Tags: {

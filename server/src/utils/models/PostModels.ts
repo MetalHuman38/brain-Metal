@@ -62,7 +62,7 @@ Posts.init(
 
       Caption: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
 
       Tags: {

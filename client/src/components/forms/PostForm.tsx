@@ -26,7 +26,7 @@ const PostForm = () => {
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
-      caption: post ? post?.caption : "",
+      caption: post ? post?.caption :"",
       file: [],
       location: post ? post?.location : "",
       tags: post ? post.tags.join(',') : "",
@@ -37,6 +37,7 @@ const PostForm = () => {
   async function onSubmit(values: z.infer<typeof PostValidation>) {
     try {
       setisPostLoading(true);
+      console.log("Form values:", values);
       const newPost = await axios.post("http://localhost:3000/api/createPost", values);
       console.log(newPost);
       toast({
@@ -76,12 +77,9 @@ const PostForm = () => {
             <FormItem>
               <FormLabel className="shad-form_label"> Add Photo </FormLabel>
               <FormControl>
-                <FileUpLoader
-                  fieldChange={field.onChange}
-                  mediaUrl={post?.mediaUrl}
-                />
+                <FileUpLoader handleFile={(file) => field.onChange(file)} />
               </FormControl>
-              <FormMessage className="shad-form_message" />
+              <FormMessage className="shad-form_message" /> 
             </FormItem>
           )}
         />

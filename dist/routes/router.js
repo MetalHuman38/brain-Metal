@@ -6,12 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const loggerMiddleware_1 = require("../middleware/loggerMiddleware");
 require("dotenv/config");
-const testDatabase_1 = __importDefault(require("../utils/testDatabase"));
+const testDatabase_1 = require("../utils/testDatabase");
 const userRoutes_1 = __importDefault(require("./userRoutes"));
 const authRoutes_1 = __importDefault(require("./authRoutes"));
 const postRoutes_1 = __importDefault(require("./postRoutes"));
 const likesRoutes_1 = __importDefault(require("./likesRoutes"));
 const commentRoutes_1 = __importDefault(require("./commentRoutes"));
+const imageRoutes_1 = __importDefault(require("./imageRoutes"));
 const router = express_1.default.Router();
 router.use(authRoutes_1.default);
 // Use the user router for handling user-related routes
@@ -22,11 +23,13 @@ router.use(postRoutes_1.default);
 router.use(likesRoutes_1.default);
 // Use the comment router for handling comment-related routes
 router.use(commentRoutes_1.default);
+// Use image router for handling image-related routes
+router.use(imageRoutes_1.default);
 // Use the logger middleware for all routes
 router.use(loggerMiddleware_1.logger);
 router.get('/Get-User', async (req, res) => {
     try {
-        (0, testDatabase_1.default)();
+        (0, testDatabase_1.testQueryExecution)();
         res.send('Query executed successfully!');
     }
     catch (error) {

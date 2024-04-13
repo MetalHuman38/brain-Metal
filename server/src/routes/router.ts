@@ -1,12 +1,13 @@
 import express, { Request, Response } from 'express';
 import { logger } from '../middleware/loggerMiddleware';
 import 'dotenv/config';
-import testQueryExecution from '../utils/testDatabase';
+import { testQueryExecution } from '../utils/testDatabase';
 import userRouter from './userRoutes';
 import authRoutes from './authRoutes';
 import postRoutes from './postRoutes';
 import likesRoutes from './likesRoutes';
 import commentRoutes from './commentRoutes';
+import imageRoutes from './imageRoutes';
 
 const router = express.Router();
 
@@ -24,6 +25,9 @@ router.use(likesRoutes);
 
 // Use the comment router for handling comment-related routes
 router.use(commentRoutes);
+
+// Use image router for handling image-related routes
+router.use(imageRoutes);
 
 // Use the logger middleware for all routes
 router.use(logger);

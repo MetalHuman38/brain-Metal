@@ -1,7 +1,6 @@
 import express from 'express';
 import 'dotenv/config';
 import router from './routes/router';
-import logDBVersion from './utils/testDatabase';
 import http from 'http';
 import cookieParser from 'cookie-parser';
 
@@ -26,7 +25,12 @@ app.use(router);
 // Start the server
 async function startServer() {
     try {
-      await logDBVersion(); // Log database version
+      await new Promise<void>((resolve, reject) => {
+        server.on('request', app);
+        server.listen(process.env.PORT || 3000, () => {
+          resolve();
+        });
+      });
     } catch (error) {
       console.error('Error starting server:', error);
       process.exit(1); // Exit process with error code
@@ -38,9 +42,10 @@ async function startServer() {
     socket.destroy(); // Destroy the socket to prevent further events
   });
 
-  const PORT = process.env.PORT || 3000;
-      app.listen(PORT, () => {
-      console.log(`Server is running on http://localhost:${PORT}`);
-      });
+  // const PORT = process.env.PORT || 3000;
+  //     app.listen(PORT, () => {
+  //     console.log(`Server is running on http://localhost:${PORT}`);
+  //     });
 
   startServer();
+

@@ -10,11 +10,11 @@ interface DBConfig {
 }
 
 const dbConfig: DBConfig = {
-    dialect: 'mariadb', // Specify the dialect as Dialect type
-    host: process.env.DATABASE_HOST || 'localhost',
-    username: process.env.MARIADB_USER || 'root',
-    password: process.env.MARIADB_PASSWORD || 'London1983@@@!',
-    database: process.env.MARIADB_DATABASE || 'brainmetal',
+    dialect: 'mysql', // Specify the dialect as Dialect type
+    host: process.env.MYSQL_DATABASE_HOST || 'localhost',
+    username: process.env.MYSQL_USER || 'root',
+    password: process.env.MYSQL_PASSWORD || 'LondonDev1983@@%&!',
+    database: process.env.MYSQL_DATABASE || 'MetalBrain',
 };
 
 export function createSequelizeInstance(): Sequelize {

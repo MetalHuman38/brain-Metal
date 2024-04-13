@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 require("dotenv/config");
 const router_1 = __importDefault(require("./routes/router"));
-const testDatabase_1 = __importDefault(require("./utils/testDatabase"));
 const http_1 = __importDefault(require("http"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const app = (0, express_1.default)();
@@ -26,7 +25,12 @@ app.use(router_1.default);
 // Start the server
 async function startServer() {
     try {
-        await (0, testDatabase_1.default)(); // Log database version
+        await new Promise((resolve, reject) => {
+            server.on('request', app);
+            server.listen(process.env.PORT || 3000, () => {
+                resolve();
+            });
+        });
     }
     catch (error) {
         console.error('Error starting server:', error);
@@ -37,9 +41,9 @@ const server = http_1.default.createServer();
 server.on('clientError', (err, socket) => {
     socket.destroy(); // Destroy the socket to prevent further events
 });
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
+// const PORT = process.env.PORT || 3000;
+//     app.listen(PORT, () => {
+//     console.log(`Server is running on http://localhost:${PORT}`);
+//     });
 startServer();
 //# sourceMappingURL=server.js.map
