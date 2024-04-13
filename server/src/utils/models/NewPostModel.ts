@@ -5,7 +5,7 @@ import Users from './UserModel';
 interface NewPostAttributes {
   PostID: number;
   CreatorID: number | null;
-  File: [] | null;
+  ImageURL: string | null;
   Caption: string;
   Tags: string;
   Location: string | null;
@@ -21,7 +21,7 @@ class NewPosts extends Model<NewPostAttributes, NewPostCreationAttributes> imple
   public PostID!: number;
   public CreatorID!: number | null;
   public Caption!: string;
-  public File!: [] | null;    
+  public ImageURL!: string | null;   
   public Tags!: string;
   public Location!: string | null;
   public CreatedAt: Date | undefined;
@@ -50,11 +50,11 @@ NewPosts.init(
 
       Caption: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
 
-      File: {
-        type: DataTypes.ARRAY(DataTypes.STRING),
+      ImageURL: {
+        type: DataTypes.STRING,
         allowNull: true,
       },
 

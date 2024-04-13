@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import Posts from '../utils/models/PostModels';
-import { deleteFile, saveImageAndUrlToDatabase } from '../utils/ImageUtils';
+import { deleteFile, saveImageAndUrlToDatabase } from '../Uploads/ImageUtils';
 import { INewPost } from '../utils/types';
 import NewPosts from '../utils/models/NewPostModel';
 
@@ -10,28 +10,17 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
 
     const post: INewPost = req.body;
 
-    const imageFile = req.file;
-    let ImageURL: string | null = null;
-    
-    if(imageFile) {
-
-      const imageDirectory = '/public/assests/images';
-      const imageURL = await saveImageAndUrlToDatabase(imageFile.path, imageDirectory);
-      ImageURL = imageURL;
-      
-    }
-
     const Newpost = await NewPosts.createPost({
       CreatorID: post.CreatorID || null,
       Caption: post.Caption, 
-      File: [],
+      ImageURL: post.ImageURL || null,
       Location: post.Location || null,
       Tags: Array.isArray(post.Tags) ? post.Tags.join(',') : '',
       CreatedAt: new Date()
     });
 
     if (!Newpost) {
-      res.status(400).json({ message: 'Error creating user account.' });
+      res.status(400).json({ message: 'Error creating Post.' });
       return;
     }
 
@@ -42,7 +31,7 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
       Likes: 0,
       Caption: post.Caption, 
       Tags: Array.isArray(post.Tags) ? post.Tags.join(',') : '',
-      ImageURL: ImageURL,
+      ImageURL: post.ImageURL,
       Location: post.Location || null,
       CreatedAt: new Date(),
       UpdatedAt: new Date()

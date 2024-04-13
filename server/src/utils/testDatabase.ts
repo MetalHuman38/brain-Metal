@@ -8,21 +8,28 @@ async function getUsers() {
     const sequelize = await waitForDB();
 
     // Execute raw SQL query to fetch users
-    const users = await sequelize.query("SELECT * FROM User", { type: QueryTypes.SELECT });
+    const posts = await sequelize.query("SELECT * FROM Posts", { type: QueryTypes.SELECT });
 
-    return users;
+    return posts;
   } catch (error) {
-    throw new Error(`Error getting users: ${error}`);
+    throw new Error(`Error getting post: ${error}`);
   }
 }
 
 // Test the getUsers function
+export async function testQueryExecution() {
+  const users = await getUsers();
+  console.log(users);
+}
+
+// Test the getUsers function
 getUsers()
-  .then((users) => {
-    console.log('User:', users);
+  .then((posts) => {
+    console.log('Post:', posts);
   })
   .catch((error) => {
     console.error(error.message);
   });
 
-export default getUsers;
+
+

@@ -5,29 +5,22 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePostById = exports.updatePostById = exports.getPostById = exports.getRecentPosts = exports.SavePostToDatabase = exports.createPost = void 0;
 const PostModels_1 = __importDefault(require("../utils/models/PostModels"));
-const ImageUtils_1 = require("../utils/ImageUtils");
+const ImageUtils_1 = require("../Uploads/ImageUtils");
 const NewPostModel_1 = __importDefault(require("../utils/models/NewPostModel"));
 // Create a new post
 const createPost = async (req, res) => {
     try {
         const post = req.body;
-        const imageFile = req.file;
-        let ImageURL = null;
-        if (imageFile) {
-            const imageDirectory = '/public/assests/images';
-            const imageURL = await (0, ImageUtils_1.saveImageAndUrlToDatabase)(imageFile.path, imageDirectory);
-            ImageURL = imageURL;
-        }
         const Newpost = await NewPostModel_1.default.createPost({
             CreatorID: post.CreatorID || null,
             Caption: post.Caption,
-            File: [],
+            ImageURL: post.ImageURL || null,
             Location: post.Location || null,
             Tags: Array.isArray(post.Tags) ? post.Tags.join(',') : '',
             CreatedAt: new Date()
         });
         if (!Newpost) {
-            res.status(400).json({ message: 'Error creating user account.' });
+            res.status(400).json({ message: 'Error creating Post.' });
             return;
         }
         // Create a new post object
@@ -37,7 +30,7 @@ const createPost = async (req, res) => {
             Likes: 0,
             Caption: post.Caption,
             Tags: Array.isArray(post.Tags) ? post.Tags.join(',') : '',
-            ImageURL: ImageURL,
+            ImageURL: post.ImageURL,
             Location: post.Location || null,
             CreatedAt: new Date(),
             UpdatedAt: new Date()

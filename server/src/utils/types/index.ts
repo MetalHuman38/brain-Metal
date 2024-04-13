@@ -16,7 +16,7 @@ export type INavLink = {
   export type INewPost = {
     CreatorID: number | null;
     Caption: string;
-    File: File[];
+    ImageURL: string;
     Location?: string;
     Tags?: string;
   };
