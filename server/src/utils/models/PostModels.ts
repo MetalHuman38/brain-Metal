@@ -3,7 +3,6 @@ import { createSequelizeInstance } from './sequelizeCon';
 
 interface PostAttributes {
   PostID: number;
-  CreatorID: number | null;
   Likes: number | null;
   Caption: string;
   Tags: string;
@@ -21,7 +20,6 @@ const sequelize = createSequelizeInstance();
 
 class Posts extends Model<PostAttributes, PostCreationAttributes> implements PostAttributes {
   public PostID!: number;
-  public CreatorID!: number | null;
   public Likes!: number | null;
   public Caption!: string;    
   public Tags!: string;
@@ -30,10 +28,10 @@ class Posts extends Model<PostAttributes, PostCreationAttributes> implements Pos
   public CreatedAt: Date | undefined;
   public UpdatedAt: Date | undefined;
 
-  static async findAllUserPosts(creatorID: number): Promise<Posts[]> {
+  static async findAllUserPosts(postID: number): Promise<Posts[]> {
     return await this.findAll({
       where: {
-        CreatorID: creatorID
+        PostID: postID
       },
       order: [['CreatedAt', 'DESC']],
       limit: 10
@@ -50,11 +48,7 @@ Posts.init(
       autoIncrement: true,
       allowNull: false
     },
-    CreatorID: {
-        type: DataTypes.INTEGER,
-        allowNull: true,
-      },
-
+    
       Likes: {
         type: DataTypes.INTEGER,
         allowNull: true,

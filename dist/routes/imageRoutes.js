@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
+const UserModel_1 = __importDefault(require("../utils/models/UserModel"));
 const router = express_1.default.Router();
 // Enable CORS for all routes
 router.use((0, cors_1.default)());
@@ -21,28 +22,32 @@ const storage = multer_1.default.diskStorage({
 const upload = (0, multer_1.default)({
     storage: storage,
 });
-router.post('/api/upload', upload.single('image'), (req, res) => {
-    if (Error instanceof multer_1.default.MulterError) {
-        // Multer error (e.g., file size exceeded)
-        console.error('Multer error:', Error);
-        res.status(400).json({ error: 'File upload failed', details: Error.message });
-    }
-    else if (Error instanceof Error) {
-        // Other errors
-        console.error('Error uploading image:', Error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-    else {
-        // Upload successful
+router.post('/api/upload', upload.single('image'), async (req, res) => {
+    try {
         if (req.file) {
+            // Upload successful
             const imagePath = path_1.default.join('Uploads', req.file.filename);
             console.log('Image uploaded successfully:', imagePath);
             res.status(200).json({ success: true, imagePath: imagePath });
+            // Generate the image URL
+            const imageURL = `http://localhost:3000/${imagePath}`;
+            // Update the user's image URL in the database
+            await UserModel_1.default.update({ ImageURL: imageURL }, {
+                where: { UserID: req.body.UserID } // Assuming you have the user ID in req.user
+            });
+            // Send a response
+            res.status(200).json({ success: true, imageURL: imageURL });
         }
         else {
-            console.error('Error uploading image: req.file is undefined');
-            res.status(500).json({ error: 'Internal server error' });
+            // No file was uploaded
+            console.error('No file uploaded');
+            res.status(400).json({ error: 'No file uploaded' });
         }
+    }
+    catch (err) {
+        // Error handling
+        console.error('Error uploading image:', err);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 exports.default = router;

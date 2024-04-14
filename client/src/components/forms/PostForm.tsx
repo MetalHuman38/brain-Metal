@@ -29,7 +29,7 @@ const PostForm = () => {
       caption: post ? post?.caption :"",
       file: [],
       location: post ? post?.location : "",
-      tags: post ? post.tags.join(',') : "",
+      tags: post ? post?.tags : "",
     },
   })
 

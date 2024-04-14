@@ -1,17 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import multer from 'multer';
 
-
-// Set storage engine
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './dist/Uploads');
-    },
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}_${file.originalname}`);
-    },
-});
 
 export async function saveImageAndUrlToDatabase(imageFile: fs.PathLike, imageDirectory: string) {
     const imageFilename = `${Date.now()}_${path.basename(imageFile.toString())}`;

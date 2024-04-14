@@ -2,9 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
-import { createSequelizeInstance } from '../utils/models/sequelizeCon';
-import { QueryTypes } from 'sequelize';
-
+import Users from '../utils/models/UserModel';
 
 const router = express.Router();
 
@@ -24,29 +22,36 @@ const upload = multer({
     storage: storage,
 })
 
-router.post('/api/upload', upload.single('image'), (req, res) => {
-        
-        if (Error instanceof multer.MulterError) {
-            // Multer error (e.g., file size exceeded)
-            console.error('Multer error:', Error);
-            res.status(400).json({ error: 'File upload failed', details: Error.message });
-        } else if (Error instanceof Error) {
-            // Other errors
-            console.error('Error uploading image:', Error);
-            res.status(500).json({ error: 'Internal server error' });
-        } else {
+
+router.post('/api/upload', upload.single('image'), async (req, res) => {
+    try {
+        if (req.file) {
             // Upload successful
-            if (req.file) {
-                const imagePath = path.join('Uploads', req.file.filename);
-                console.log('Image uploaded successfully:', imagePath);
-                res.status(200).json({ success: true, imagePath: imagePath });
-            } else {
-                console.error('Error uploading image: req.file is undefined');
-                res.status(500).json({ error: 'Internal server error' });
-            }
+            const imagePath = path.join('Uploads', req.file.filename);
+            console.log('Image uploaded successfully:', imagePath);
+            res.status(200).json({ success: true, imagePath: imagePath });
+
+            // Generate the image URL
+            const imageURL = `http://localhost:3000/${imagePath}`;
+
+            // Update the user's image URL in the database
+            await Users.update({ ImageURL: imageURL }, {
+                where: { UserID: req.body.UserID } // Assuming you have the user ID in req.user
+            });
+
+            // Send a response
+            res.status(200).json({ success: true, imageURL: imageURL });
+
+        } else {
+            // No file was uploaded
+            console.error('No file uploaded');
+            res.status(400).json({ error: 'No file uploaded' });
         }
-    });
-
-
+    } catch (err) {
+        // Error handling
+        console.error('Error uploading image:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 export default router;

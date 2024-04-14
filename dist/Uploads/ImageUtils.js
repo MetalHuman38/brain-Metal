@@ -6,16 +6,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteFile = exports.saveImageAndUrlToDatabase = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
-const multer_1 = __importDefault(require("multer"));
-// Set storage engine
-const storage = multer_1.default.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, './dist/Uploads');
-    },
-    filename: function (req, file, cb) {
-        cb(null, `${Date.now()}_${file.originalname}`);
-    },
-});
 async function saveImageAndUrlToDatabase(imageFile, imageDirectory) {
     const imageFilename = `${Date.now()}_${path_1.default.basename(imageFile.toString())}`;
     const imagePath = path_1.default.join(imageDirectory, imageFilename);
