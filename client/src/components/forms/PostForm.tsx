@@ -14,6 +14,7 @@ import { useState } from "react";
 import axios from "axios";
 
 
+
 const PostForm = () => {
 
   const [post, setPost] = useState(null);
@@ -29,7 +30,7 @@ const PostForm = () => {
       caption: post ? post?.caption :"",
       file: [],
       location: post ? post?.location : "",
-      tags: post ? post.tags.join(',') : "",
+      tags: post ? post?.tags : "",
     },
   })
 

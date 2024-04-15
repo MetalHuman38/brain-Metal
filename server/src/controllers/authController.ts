@@ -14,5 +14,9 @@ export function verifyToken(token: string): any {
     return jwt.verify(token, process.env.JWT_SECRET as string);
 }
 
+export function getTokenCurrentUser(token: string): any {
+    return jwt.verify(token, process.env.JWT_SECRET as string);
+}
 
-export default { generateToken, verifyToken };
+
+export default { generateToken, verifyToken, getTokenCurrentUser };

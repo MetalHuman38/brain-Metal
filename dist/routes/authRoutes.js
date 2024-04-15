@@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const authController_1 = __importDefault(require("../controllers/authController"));
 const router = express_1.default.Router();
+// // Enable CORS for all routes
+// router.use(cors());
 // Define the route for generating JWT tokens (e.g., user login)
 router.post('/api/generateToken', authController_1.default.generateToken);
 // Define the route for verifying JWT tokens (e.g., user authentication)

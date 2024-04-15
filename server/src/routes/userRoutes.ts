@@ -12,7 +12,7 @@ router.use(cors());
 router.post('/api/register', registerUser);
 
 // Define the route for user login with JWT authentication middleware
-router.post('/api/login',  loginUser);
+router.post('/api/login', loginUser);
 
 // Define the route for getting the current user with JWT authentication middleware
 router.get('/api/getCurrentUser', authenticate, getCurrentUser)

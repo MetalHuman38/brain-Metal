@@ -139,8 +139,8 @@ Users.init(
 );
 
 // Define associations
-Users.hasMany(Posts, { foreignKey: 'CreatorID', as: 'posts' });
+Users.hasMany(Posts, { foreignKey: 'PostID', as: 'posts' });
 Users.hasMany(Comment, { foreignKey: 'UserID', as: 'comments' });
-Posts.belongsTo(Users, { foreignKey: 'CreatorID', as: 'creator' });
+Posts.belongsTo(Users, { foreignKey: 'PostID', as: 'creator' });
 
 export default Users;

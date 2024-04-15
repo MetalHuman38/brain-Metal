@@ -95,8 +95,8 @@ Users.init({
     timestamps: false
 });
 // Define associations
-Users.hasMany(PostModels_1.default, { foreignKey: 'CreatorID', as: 'posts' });
+Users.hasMany(PostModels_1.default, { foreignKey: 'PostID', as: 'posts' });
 Users.hasMany(CommentsModel_1.default, { foreignKey: 'UserID', as: 'comments' });
-PostModels_1.default.belongsTo(Users, { foreignKey: 'CreatorID', as: 'creator' });
+PostModels_1.default.belongsTo(Users, { foreignKey: 'PostID', as: 'creator' });
 exports.default = Users;
 //# sourceMappingURL=UserModel.js.map

@@ -5,10 +5,10 @@ const sequelizeCon_1 = require("./sequelizeCon");
 // Define Instance of Sequelize
 const sequelize = (0, sequelizeCon_1.createSequelizeInstance)();
 class Posts extends sequelize_1.Model {
-    static async findAllUserPosts(creatorID) {
+    static async findAllUserPosts(postID) {
         return await this.findAll({
             where: {
-                CreatorID: creatorID
+                PostID: postID
             },
             order: [['CreatedAt', 'DESC']],
             limit: 10
@@ -22,10 +22,6 @@ Posts.init({
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
-    },
-    CreatorID: {
-        type: sequelize_1.DataTypes.INTEGER,
-        allowNull: true,
     },
     Likes: {
         type: sequelize_1.DataTypes.INTEGER,

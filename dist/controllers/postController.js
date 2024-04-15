@@ -1,4 +1,9 @@
 "use strict";
+// import { Request, Response } from 'express';
+// import Posts from '../utils/models/PostModels';
+// import { deleteFile, saveImageAndUrlToDatabase } from '../Uploads/ImageUtils';
+// import { INewPost } from '../utils/types';
+// import NewPosts from '../utils/models/NewPostModel';
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -11,12 +16,13 @@ const NewPostModel_1 = __importDefault(require("../utils/models/NewPostModel"));
 const createPost = async (req, res) => {
     try {
         const post = req.body;
+        // Extract the post from form values
         const Newpost = await NewPostModel_1.default.createPost({
-            CreatorID: post.CreatorID || null,
-            Caption: post.Caption,
-            ImageURL: post.ImageURL || null,
-            Location: post.Location || null,
-            Tags: Array.isArray(post.Tags) ? post.Tags.join(',') : '',
+            NewPostID: 0,
+            Caption: post.caption,
+            ImageURL: req.file ? req.file.path : null,
+            Tags: post.tags || '', // Handle undefined tags
+            Location: post.location || null,
             CreatedAt: new Date()
         });
         if (!Newpost) {
@@ -25,13 +31,12 @@ const createPost = async (req, res) => {
         }
         // Create a new post object
         const newPost = await PostModels_1.default.create({
-            PostID: Newpost.PostID,
-            CreatorID: post.CreatorID || null,
+            PostID: 0,
             Likes: 0,
-            Caption: post.Caption,
-            Tags: Array.isArray(post.Tags) ? post.Tags.join(',') : '',
-            ImageURL: post.ImageURL,
-            Location: post.Location || null,
+            Caption: post.caption,
+            Tags: post.tags || '',
+            ImageURL: req.file ? req.file.path : null,
+            Location: post.location || null,
             CreatedAt: new Date(),
             UpdatedAt: new Date()
         });
@@ -57,7 +62,6 @@ async function SavePostToDatabase(post) {
         // Create a new post object
         const newPost = await PostModels_1.default.create({
             PostID: post.PostID,
-            CreatorID: post.CreatorID || null,
             Likes: post.Likes || null,
             Caption: post.Caption,
             Tags: post.Tags,

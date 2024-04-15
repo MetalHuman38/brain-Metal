@@ -49,55 +49,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
   
   
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    }
-  }, []);
-
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setisUserLoading(true);
-      axios.get("http://localhost:3000/api/getCurrentUser")
-        .then((response) => {setUser(response.data);})
-        .catch((error) => {
-          console.error('Error getting current user:', error);
-          setUser(null);
-          localStorage.removeItem("accessToken");
-          delete axios.defaults.headers.common["Authorization"];
-        })
-        .finally(() => {
-          setisUserLoading(false);
-        });
-    } else {
-      setUser(null);
-    }
-  }, []);
-
-   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if(token) {
-      setisPostLoading(true);
-      axios.get("http://localhost:3000/api/getRecentPosts")
-        .then((response) => {
-          setPosts(response.data);
-        })
-        .catch((error) => {
-          console.error('Error getting posts:', error);
-          setPosts([]);
-          localStorage.removeItem("accessToken");
-        })
-        .finally(() => {
-          setisPostLoading(false);
-        });
-    } else{
-      setPosts([]);
-    }
-   }, [user]);
-
   async function login(values: { email: string; password: string }) {
     try {
     const response = await axios.post("http://localhost:3000/api/login", values);
@@ -113,7 +64,61 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 }
 
-  
+useEffect(() => {
+  const accessToken = localStorage.getItem("token");
+  if (accessToken) {
+    axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+  }
+}, []);
+
+  useEffect(() => {
+    const currentUserToken = localStorage.getItem("token");
+    if (currentUserToken) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${currentUserToken}`;
+      setisUserLoading(true);
+      axios.get("http://localhost:3000/api/getCurrentUser")
+        .then((response) => {setUser(response.data);
+        setisUserLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error getting current user:', error);
+          setUser(null);
+          localStorage.removeItem("accessToken");
+          delete axios.defaults.headers.common["Authorization"];
+          setisUserLoading(false);
+        })
+        .finally(() => {
+          setisUserLoading(false);
+        });
+    } else {
+      setUser(null);
+    }
+  }, []);
+
+
+   useEffect(() => {
+    const accessToken = localStorage.getItem("token");
+    if(accessToken) {
+      setisPostLoading(true);
+      axios.get("http://localhost:3000/api/getRecentPosts")
+        .then((response) => {
+          setPosts(response.data);
+          setisPostLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error getting posts:', error);
+          setPosts([]);
+          localStorage.removeItem("accessToken");
+        })
+        .finally(() => {
+          setisPostLoading(false);
+        });
+    } else{
+      setPosts([]);
+    }
+   }, [user]);
+
+
   async function logout() {
     setUser(null);
     localStorage.removeItem("token");

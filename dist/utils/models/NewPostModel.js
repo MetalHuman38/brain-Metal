@@ -8,23 +8,19 @@ const sequelizeCon_1 = require("./sequelizeCon");
 const UserModel_1 = __importDefault(require("./UserModel"));
 // Define Instance of Sequelize
 const sequelize = (0, sequelizeCon_1.createSequelizeInstance)();
-class NewPosts extends sequelize_1.Model {
+class newposts extends sequelize_1.Model {
     // Create custom class methods to create a new post
     static async createPost(attributes) {
         return await this.create(attributes);
     }
 }
 // Define the User model
-NewPosts.init({
-    PostID: {
+newposts.init({
+    NewPostID: {
         type: sequelize_1.DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false
-    },
-    CreatorID: {
-        type: sequelize_1.DataTypes.INTEGER,
-        allowNull: true,
     },
     Caption: {
         type: sequelize_1.DataTypes.STRING,
@@ -49,15 +45,15 @@ NewPosts.init({
     },
 }, {
     sequelize,
-    tableName: 'NewPosts',
+    tableName: 'newposts',
     createdAt: 'CreatedAt',
     timestamps: false
 });
 // Create foreign key relationship
-NewPosts.belongsTo(UserModel_1.default, {
-    foreignKey: 'CreatorID',
+newposts.belongsTo(UserModel_1.default, {
+    foreignKey: 'NewPostID',
     targetKey: 'UserID',
     as: 'creator'
 });
-exports.default = NewPosts;
+exports.default = newposts;
 //# sourceMappingURL=NewPostModel.js.map
