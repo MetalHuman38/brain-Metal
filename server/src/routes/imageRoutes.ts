@@ -1,17 +1,15 @@
 import express from 'express';
-import cors from 'cors';
 import multer from 'multer';
 import path from 'path';
 import Users from '../utils/models/UserModel';
 
+
 const router = express.Router();
 
-// Enable CORS for all routes
-router.use(cors());
 
 // Set storage engine
 const storage = multer.diskStorage({
-    destination: path.join(__dirname, 'src', 'Uploads'),
+    destination: path.join(__dirname, '..', '..', 'Uploads'),
     filename: function (req, file, cb) {
         const timestamp = Date.now(); 
         cb(null, `${timestamp}_${file.originalname}`);
@@ -34,9 +32,12 @@ router.post('/api/upload', upload.single('image'), async (req, res) => {
             // Generate the image URL
             const imageURL = `http://localhost:3000/${imagePath}`;
 
+            // Get the logged-in user's ID to insert the image URL
+            const userId = req.body.UserID;
+            
             // Update the user's image URL in the database
             await Users.update({ ImageURL: imageURL }, {
-                where: { UserID: req.body.UserID } // Assuming you have the user ID in req.user
+                where: { UserID: userId } // Assuming you have the user ID in req.user
             });
 
             // Send a response

@@ -94,27 +94,34 @@ const FileUpLoader : React.FC<FileUpLoaderProps> = ({ handleFile }) => {
         setPreviewUrl(reader.result as string);
       };
       reader.readAsDataURL(selectedFile);
-      handleFile(e.target.files[0]);
+      handleFile(selectedFile);
+      handleUpload(selectedFile);
     }
   };
-   const handleUpload = () => {
-    if (file) {
-      const formData = new FormData();
-      formData.append('image', file);
-      axios.post('http://localhost:3000/api/upload', formData)
-        .then(response => {
-          console.log('Upload successful:', response.data);
-          // Handle successful upload response if needed
-          const imageURL = response.data.imageURL;
-        })
-        .catch(error => {
-          toast({
-            title: 'Upload failed',
-          });
-          console.error('Upload failed:', error);
-        });
+  //  const handleUpload = (file: File) => {
+  //   if (file) {
+  //     const formData = new FormData();
+  //     formData.append('image', file);
+  //     axios.post('http://localhost:3000/api/upload', formData)
+  //       .then(response => { console.log('Upload successful:', response.data);})
+  //       .catch(error => console.log(error));
+  //   }
+  // };
+  const handleUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const response = await axios.post('http://localhost:3000/api/upload', formData);
+      console.log('Upload successful:', response.data);
+    } catch (error) {
+      console.error('Upload failed:', error);
+      toast({
+        title: 'Upload failed',
+      });
     }
   };
+
+  
   
   return (
     <div className='flex flex-center flex-col bg-dark-3 rounded-xl cursor-pointer'>
@@ -136,8 +143,8 @@ const FileUpLoader : React.FC<FileUpLoaderProps> = ({ handleFile }) => {
                 height={77} />
               <h3 className='base-medium text-light-2 mb-2 mt-6'>Drag photo here</h3>
               <p className='text-light-4 small-regular mb-6'>SVG, PNG, JPG</p>
-              <Button type='button' onClick={() => document.getElementById('fileInput')?.click()}
-              className='shad-button_dark_4' >Browse</Button>
+              <Button type='button' onClick={(_handleUpload) => document.getElementById('fileInput')?.click()}
+               className='shad-button_dark_4'>Browse</Button>
           </div>
     </div>
   )

@@ -154,7 +154,6 @@ import Posts from '../utils/models/PostModels';
 import { deleteFile } from '../Uploads/ImageUtils';
 import { INewPost } from '../utils/types';
 import NewPosts from '../utils/models/NewPostModel';
-import Users from '../utils/models/UserModel';
 
 
 // Create a new post

@@ -4,16 +4,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const cors_1 = __importDefault(require("cors"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const UserModel_1 = __importDefault(require("../utils/models/UserModel"));
 const router = express_1.default.Router();
-// Enable CORS for all routes
-router.use((0, cors_1.default)());
 // Set storage engine
 const storage = multer_1.default.diskStorage({
-    destination: path_1.default.join(__dirname, 'src', 'Uploads'),
+    destination: path_1.default.join(__dirname, '..', '..', 'Uploads'),
     filename: function (req, file, cb) {
         const timestamp = Date.now();
         cb(null, `${timestamp}_${file.originalname}`);
@@ -31,9 +28,11 @@ router.post('/api/upload', upload.single('image'), async (req, res) => {
             res.status(200).json({ success: true, imagePath: imagePath });
             // Generate the image URL
             const imageURL = `http://localhost:3000/${imagePath}`;
+            // Get the logged-in user's ID to insert the image URL
+            const userId = req.body.UserID;
             // Update the user's image URL in the database
             await UserModel_1.default.update({ ImageURL: imageURL }, {
-                where: { UserID: req.body.UserID } // Assuming you have the user ID in req.user
+                where: { UserID: userId } // Assuming you have the user ID in req.user
             });
             // Send a response
             res.status(200).json({ success: true, imageURL: imageURL });

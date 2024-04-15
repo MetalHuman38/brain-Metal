@@ -7,7 +7,7 @@ import UserRegistrations from '../utils/models/UserRegistrationModel';
 import Users from '../utils/models/UserModel';
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
-import { generateToken } from './authController';
+import { generateToken, getTokenCurrentUser } from './authController';
 
 
 // Controller function to handle user registration
@@ -162,10 +162,28 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export function getCurrentUser (req: Request, res: Response): void {
+export const getCurrentUser = async (req: Request, res: Response): Promise<void> => {
   try {
-  
-    const token = req.cookies.accessToken;
+
+    const { UserID } = req.body;
+
+    // Check if UserID is provided
+    if (!UserID) {
+      res.status(400).json({ message: 'UserID is required' });
+      return;
+    }
+
+    // Find the user by UserID
+    const currentUser = await Users.findByUserId(UserID);
+
+    // Check if user exists
+    if (!currentUser) {
+      res.status(404).json({ message: 'User not found' });
+      return;
+    }
+
+    // Retrieve token from request headers
+    const token = getTokenCurrentUser(req.headers.authorization || '');
 
     if (!token){
          res.status(401).json({ message: 'Unauthrized: No Token provided' });
@@ -179,16 +197,17 @@ export function getCurrentUser (req: Request, res: Response): void {
         return;
     }
 
-    const UserID = (verified as { user: { UserID: string } }).user.UserID;
+     // Extract UserID from the verified token
+     const decodedUserID = (verified as { user: { UserID: string } }).user.UserID;
 
-    const user = Users.findByUserId(UserID);
+     // Check if the UserID from the token matches the requested UserID
+     if (decodedUserID !== UserID) {
+       res.status(401).json({ message: 'Unauthorized: Invalid UserID' });
+       return;
+     }
 
-    if (!user) {
-        res.status(404).json({ message: 'User not found' });
-        return;
-    }
-    
-    res.status(200).json(user);
+  
+    res.status(200).json(currentUser);
   } catch (error) {
     console.error('Error fetching current user:', error);
     res.status(500).json({ message: 'Internal server error' });

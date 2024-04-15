@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyToken = exports.generateToken = void 0;
+exports.getTokenCurrentUser = exports.verifyToken = exports.generateToken = void 0;
 // authController.ts
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 require("dotenv/config");
@@ -18,5 +18,9 @@ function verifyToken(token) {
     return jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
 }
 exports.verifyToken = verifyToken;
-exports.default = { generateToken, verifyToken };
+function getTokenCurrentUser(token) {
+    return jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+}
+exports.getTokenCurrentUser = getTokenCurrentUser;
+exports.default = { generateToken, verifyToken, getTokenCurrentUser };
 //# sourceMappingURL=authController.js.map
