@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import NewPosts from '../utils/models/NewPostModel';
 import { INewPost } from '../utils/types';
 import Posts from '../utils/models/PostModels';
-import Users from '../utils/models/UserModel';
 
 // Create a new post
 export const createPost = async (req: Request, res: Response): Promise<void> => {
@@ -77,6 +76,3 @@ export const savePostToDatabase = async (posts: {
         return null;
     }
 };
-
-
-        

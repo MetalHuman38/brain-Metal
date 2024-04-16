@@ -3,8 +3,6 @@ import authController from '../controllers/authController';
 
 
 const router = express.Router();
-// // Enable CORS for all routes
-// router.use(cors());
 
 // Define the route for generating JWT tokens (e.g., user login)
 router.post('/api/generateToken', authController.generateToken);

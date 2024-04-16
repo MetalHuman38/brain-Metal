@@ -41,9 +41,5 @@ const server = http_1.default.createServer();
 server.on('clientError', (err, socket) => {
     socket.destroy(); // Destroy the socket to prevent further events
 });
-// const PORT = process.env.PORT || 3000;
-//     app.listen(PORT, () => {
-//     console.log(`Server is running on http://localhost:${PORT}`);
-//     });
 startServer();
 //# sourceMappingURL=server.js.map

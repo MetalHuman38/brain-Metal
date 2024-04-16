@@ -42,10 +42,6 @@ async function startServer() {
     socket.destroy(); // Destroy the socket to prevent further events
   });
 
-  // const PORT = process.env.PORT || 3000;
-  //     app.listen(PORT, () => {
-  //     console.log(`Server is running on http://localhost:${PORT}`);
-  //     });
-
-  startServer();
+ 
+startServer();
 

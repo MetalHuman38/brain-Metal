@@ -1,12 +1,7 @@
 import express, { Request, Response } from 'express';
 import { logger } from '../middleware/loggerMiddleware';
 import 'dotenv/config';
-<<<<<<< HEAD
-import { testQueryExecution } from '../utils/testDatabase';
-import userRouter from './userRoutes';
-=======
 import testQueryExecution from '../utils/testDatabase';
->>>>>>> 58fd192 (FileUpload-Complete)
 import authRoutes from './authRoutes';
 import userRouter from './userRoutes';
 import NewPostRoutes from './NewPostRoutes';
@@ -35,11 +30,7 @@ router.use(likesRoutes);
 // Use the comment router for handling comment-related routes
 router.use(commentRoutes);
 
-<<<<<<< HEAD
-// Use image router for handling image-related routes
-=======
 // Use Image router for handling image-related routes
->>>>>>> 58fd192 (FileUpload-Complete)
 router.use(imageRoutes);
 
 // Use the logger middleware for all routes

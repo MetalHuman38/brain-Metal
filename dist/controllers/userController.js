@@ -126,23 +126,9 @@ const loginUser = async (req, res) => {
     }
 };
 exports.loginUser = loginUser;
-const getCurrentUser = async (req, res) => {
+function getCurrentUser(req, res) {
     try {
-        const { UserID } = req.body;
-        // Check if UserID is provided
-        if (!UserID) {
-            res.status(400).json({ message: 'UserID is required' });
-            return;
-        }
-        // Find the user by UserID
-        const currentUser = await UserModel_1.default.findByUserId(UserID);
-        // Check if user exists
-        if (!currentUser) {
-            res.status(404).json({ message: 'User not found' });
-            return;
-        }
-        // Retrieve token from request headers
-        const token = (0, authController_1.getTokenCurrentUser)(req.headers.authorization || '');
+        const token = req.cookies.accessToken;
         if (!token) {
             res.status(401).json({ message: 'Unauthrized: No Token provided' });
             return;
@@ -153,21 +139,21 @@ const getCurrentUser = async (req, res) => {
             res.status(401).json({ message: 'Unauthrized: Invalid Token' });
             return;
         }
-        // Extract UserID from the verified token
-        const decodedUserID = verified.user.UserID;
-        // Check if the UserID from the token matches the requested UserID
-        if (decodedUserID !== UserID) {
-            res.status(401).json({ message: 'Unauthorized: Invalid UserID' });
+        const UserID = verified.user.UserID;
+        const user = UserModel_1.default.findByUserId(UserID);
+        if (!user) {
+            res.status(404).json({ message: 'User not found' });
             return;
         }
-        res.status(200).json(currentUser);
+        res.status(200).json(user);
     }
     catch (error) {
         console.error('Error fetching current user:', error);
         res.status(500).json({ message: 'Internal server error' });
     }
-};
+}
 exports.getCurrentUser = getCurrentUser;
+;
 // Controller function to handle user logout
 const logoutUser = async (req, res) => {
     try {

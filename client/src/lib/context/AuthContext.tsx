@@ -8,14 +8,11 @@ import { useNavigate } from "react-router-dom";
 // 1. Define the AuthContext type.
 type AuthContextType = {
   user: IUser | null;
-  post: INewPost | null;
+  posts: INewPost[];
   login: (values: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   register: (values: { name: string; username: string; email: string; password: string }) => Promise<void>;
-<<<<<<< HEAD
-=======
   handleUpload: (file: File) => Promise<void>;
->>>>>>> 58fd192 (FileUpload-Complete)
   createPost: (values: { Caption: string; ImageURL: string; Tags: string; Location: string }) => Promise<INewPost | null>;
   updateUser: (values: IUpdateUser) => Promise<void>;
   isUserLoading?: boolean;
@@ -30,7 +27,7 @@ type AuthContextType = {
 // 2. Create the AuthContext.
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  post: null,
+  posts: [],
   login: async () => {},
   logout: () => {},
   register: async () => {},
@@ -73,22 +70,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 }
   
   
-<<<<<<< HEAD
-  async function login(values: { email: string; password: string }) {
-    try {
-    const response = await axios.post("http://localhost:3000/api/login", values);
-    const { tokenResponse } = response.data;
-    const { user, token } = tokenResponse;
-    localStorage.setItem("tokenResponse", JSON.stringify(tokenResponse)); 
-    setUser(user);
-    localStorage.setItem("accessToken", token);
-    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    navigate("/");
-  } catch (error) {
-    console.error('Error logging in user:', error);
-  }
-}
-=======
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -166,63 +147,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
     } 
    }, [posts]);
->>>>>>> 58fd192 (FileUpload-Complete)
 
-useEffect(() => {
-  const accessToken = localStorage.getItem("token");
-  if (accessToken) {
-    axios.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-  }
-}, []);
-
-  useEffect(() => {
-    const currentUserToken = localStorage.getItem("token");
-    if (currentUserToken) {
-      axios.defaults.headers.common["Authorization"] = `Bearer ${currentUserToken}`;
-      setisUserLoading(true);
-      axios.get("http://localhost:3000/api/getCurrentUser")
-        .then((response) => {setUser(response.data);
-        setisUserLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error getting current user:', error);
-          setUser(null);
-          localStorage.removeItem("accessToken");
-          delete axios.defaults.headers.common["Authorization"];
-          setisUserLoading(false);
-        })
-        .finally(() => {
-          setisUserLoading(false);
-        });
-    } else {
-      setUser(null);
-    }
-  }, []);
-
-
-   useEffect(() => {
-    const accessToken = localStorage.getItem("token");
-    if(accessToken) {
-      setisPostLoading(true);
-      axios.get("http://localhost:3000/api/getRecentPosts")
-        .then((response) => {
-          setPosts(response.data);
-          setisPostLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error getting posts:', error);
-          setPosts([]);
-          localStorage.removeItem("accessToken");
-        })
-        .finally(() => {
-          setisPostLoading(false);
-        });
-    } else{
-      setPosts([]);
-    }
-   }, [user]);
-
-
+  
   async function logout() {
     setUser(null);
     localStorage.removeItem("token");
@@ -243,26 +169,12 @@ useEffect(() => {
     return !!user;
   }
 
-<<<<<<< HEAD
-  async function createPost(values: { Caption: string; ImageURL: string; Tags: string; Location: string }) {
-    try {
-      const response = await axios.post("http://localhost:3000/api/createPost", values);
-      setisSuccess(true);
-      return response.data;
-    } catch (error) {
-      console.error('Error creating post:', error);
-      setisSuccess(false);
-      return null;
-    }
-  }
-=======
 
->>>>>>> 58fd192 (FileUpload-Complete)
 
   return (
     <AuthContext.Provider value={{ 
       user,
-      post: posts[0] || null,
+      posts,
       login, 
       logout, 
       register, 
@@ -283,4 +195,3 @@ useEffect(() => {
 export default AuthProvider;
 
 export const useUserContext = () => useContext(AuthContext);
-

@@ -15,7 +15,6 @@ import { useState } from "react";
 
 
 
-
 const PostForm = () => {
 
   const { isPostLoading, setisPostLoading } = useUserContext();
@@ -28,17 +27,10 @@ const PostForm = () => {
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
-<<<<<<< HEAD
-      caption: post ? post?.caption :"",
-      file: [],
-      location: post ? post?.location : "",
-      tags: post ? post?.tags : "",
-=======
       caption: posts ? posts?.caption : "",
       file: [],
       location: posts ? posts?.location : "",
       tags: posts ? posts.tags.join(',') : "",
->>>>>>> 58fd192 (FileUpload-Complete)
     },
   })
 
@@ -46,7 +38,6 @@ const PostForm = () => {
   async function onSubmit(values: z.infer<typeof PostValidation>) {
     try {
       setisPostLoading(true);
-      console.log("Form values:", values);
       const newPost = await axios.post("http://localhost:3000/api/createPost", values);
       console.log(newPost.data)
       console.log(newPost);
@@ -87,16 +78,12 @@ const PostForm = () => {
             <FormItem>
               <FormLabel htmlFor="fileInput" className="shad-form_label"> Add Photo </FormLabel>
               <FormControl>
-<<<<<<< HEAD
-                <FileUpLoader handleFile={(file) => field.onChange(file)} />
-=======
                 <FileUpLoader
                   fieldChange={field.onChange}
                   mediaUrl={posts?.mediaUrl}
                 />
->>>>>>> 58fd192 (FileUpload-Complete)
               </FormControl>
-              <FormMessage className="shad-form_message" /> 
+              <FormMessage className="shad-form_message" />
             </FormItem>
           )}
         />
@@ -142,4 +129,3 @@ const PostForm = () => {
 }
 
 export default PostForm
-
