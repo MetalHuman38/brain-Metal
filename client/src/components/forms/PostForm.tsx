@@ -10,27 +10,35 @@ import FileUpLoader from "../shared/FileUploader"
 import { PostValidation } from "@/lib/validation"
 import { useUserContext } from "@/lib/context/AuthContext"
 import { useToast } from "../ui/use-toast"
-import { useState } from "react";
 import axios from "axios";
+import { useState } from "react";
+
 
 
 
 const PostForm = () => {
 
-  const [post, setPost] = useState(null);
   const { isPostLoading, setisPostLoading } = useUserContext();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [posts, setPost] = useState();
   
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
+<<<<<<< HEAD
       caption: post ? post?.caption :"",
       file: [],
       location: post ? post?.location : "",
       tags: post ? post?.tags : "",
+=======
+      caption: posts ? posts?.caption : "",
+      file: [],
+      location: posts ? posts?.location : "",
+      tags: posts ? posts.tags.join(',') : "",
+>>>>>>> 58fd192 (FileUpload-Complete)
     },
   })
 
@@ -40,6 +48,7 @@ const PostForm = () => {
       setisPostLoading(true);
       console.log("Form values:", values);
       const newPost = await axios.post("http://localhost:3000/api/createPost", values);
+      console.log(newPost.data)
       console.log(newPost);
       toast({
         title: 'Post created successfully',
@@ -76,9 +85,16 @@ const PostForm = () => {
           name="file"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label"> Add Photo </FormLabel>
+              <FormLabel htmlFor="fileInput" className="shad-form_label"> Add Photo </FormLabel>
               <FormControl>
+<<<<<<< HEAD
                 <FileUpLoader handleFile={(file) => field.onChange(file)} />
+=======
+                <FileUpLoader
+                  fieldChange={field.onChange}
+                  mediaUrl={posts?.mediaUrl}
+                />
+>>>>>>> 58fd192 (FileUpload-Complete)
               </FormControl>
               <FormMessage className="shad-form_message" /> 
             </FormItem>
@@ -126,3 +142,4 @@ const PostForm = () => {
 }
 
 export default PostForm
+

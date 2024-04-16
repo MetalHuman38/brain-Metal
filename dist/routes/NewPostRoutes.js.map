@@ -1,0 +1,1 @@
+{"version":3,"file":"NewPostRoutes.js","sourceRoot":"","sources":["../../server/src/routes/NewPostRoutes.ts"],"names":[],"mappings":";;;;;AAAA,sDAA8B;AAC9B,gDAAwB;AACxB,wEAA8D;AAE9D,MAAM,MAAM,GAAG,iBAAO,CAAC,MAAM,EAAE,CAAC;AAEhC,6BAA6B;AAC7B,MAAM,CAAC,GAAG,CAAC,IAAA,cAAI,GAAE,CAAC,CAAC;AAEnB,oBAAoB;AACpB,MAAM,CAAC,IAAI,CAAC,iBAAiB,EAAE,8BAAU,CAAC,CAAC;AAE3C,kBAAe,MAAM,CAAC"}

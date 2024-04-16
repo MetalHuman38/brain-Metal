@@ -33,7 +33,7 @@ Posts.init({
     },
     Tags: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
     },
     ImageURL: {
         type: sequelize_1.DataTypes.STRING,

@@ -151,6 +151,7 @@
 
 import { Request, Response } from 'express';
 import Posts from '../utils/models/PostModels';
+<<<<<<< HEAD
 import { deleteFile } from '../Uploads/ImageUtils';
 import { INewPost } from '../utils/types';
 import NewPosts from '../utils/models/NewPostModel';
@@ -236,6 +237,9 @@ export async function SavePostToDatabase(post: {
     return null;
   }
 }
+=======
+
+>>>>>>> 58fd192 (FileUpload-Complete)
 
 // Get Recent Posts
 export const getRecentPosts = async (req: Request, res: Response): Promise<void> => {

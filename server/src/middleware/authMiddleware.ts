@@ -31,5 +31,10 @@ export function authenticate(req: Request, res: Response, next: NextFunction) {
 } 
 
 
+<<<<<<< HEAD
 export default authenticate;
+=======
+
+
+>>>>>>> 58fd192 (FileUpload-Complete)
    

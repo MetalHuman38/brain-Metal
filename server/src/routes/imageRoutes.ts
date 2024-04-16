@@ -1,11 +1,18 @@
 import express from 'express';
+<<<<<<< HEAD
 import multer from 'multer';
 import path from 'path';
 import Users from '../utils/models/UserModel';
+=======
+import { uploadMiddleware, upload as multerUpload } from '../middleware/multexMiddleware';
+import cors from 'cors';
+import { userMiddleware } from '../middleware/userMiddleware';
+>>>>>>> 58fd192 (FileUpload-Complete)
 
 
 const router = express.Router();
 
+<<<<<<< HEAD
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -56,3 +63,20 @@ router.post('/api/upload', upload.single('image'), async (req, res) => {
 });
 
 export default router;
+=======
+// Enable CORS for all routes
+router.use(cors());
+
+const upload = multerUpload.single('image');
+
+router.post('/api/upload', upload, userMiddleware, uploadMiddleware,  (req, res) => {
+    try{
+        res.status(201).send({ message: 'Image uploaded successfully' });
+    } catch (err) {
+        console.error('Error uploading image:', err);
+        res.status(500).send({ error: 'Error uploading image' });
+}
+});
+
+export default router;
+>>>>>>> 58fd192 (FileUpload-Complete)

@@ -12,10 +12,15 @@ type AuthContextType = {
   login: (values: { email: string; password: string }) => Promise<void>;
   logout: () => void;
   register: (values: { name: string; username: string; email: string; password: string }) => Promise<void>;
+<<<<<<< HEAD
+=======
+  handleUpload: (file: File) => Promise<void>;
+>>>>>>> 58fd192 (FileUpload-Complete)
   createPost: (values: { Caption: string; ImageURL: string; Tags: string; Location: string }) => Promise<INewPost | null>;
   updateUser: (values: IUpdateUser) => Promise<void>;
   isUserLoading?: boolean;
   isPostLoading?: boolean;
+  isImageUploading?: boolean;
   isSuccess?: boolean;
   isAuthenticated: () => boolean;
   setisUserLoading: (value: boolean) => void;
@@ -30,9 +35,11 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
   register: async () => {},
   createPost: async () => null,
+  handleUpload: async () => {},
   updateUser: async () => {},
   isUserLoading: false,
   isPostLoading: false,
+  isImageUploading: false,
   isSuccess: false,
   isAuthenticated: () => false,
   setisUserLoading: () => {},
@@ -45,10 +52,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [posts, setPosts] = useState<INewPost[]>([]);
   const [isUserLoading, setisUserLoading] = useState(false);
   const [isPostLoading, setisPostLoading] = useState(false);
+  const [isImageUploading, setisImageUploading] = useState(false);
   const [isSuccess, setisSuccess] = useState(false);
   const navigate = useNavigate();
-  
-  
+
+
   async function login(values: { email: string; password: string }) {
     try {
     const response = await axios.post("http://localhost:3000/api/login", values);
@@ -63,6 +71,102 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     console.error('Error logging in user:', error);
   }
 }
+  
+  
+<<<<<<< HEAD
+  async function login(values: { email: string; password: string }) {
+    try {
+    const response = await axios.post("http://localhost:3000/api/login", values);
+    const { tokenResponse } = response.data;
+    const { user, token } = tokenResponse;
+    localStorage.setItem("tokenResponse", JSON.stringify(tokenResponse)); 
+    setUser(user);
+    localStorage.setItem("accessToken", token);
+    axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    navigate("/");
+  } catch (error) {
+    console.error('Error logging in user:', error);
+  }
+}
+=======
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    }
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      setisUserLoading(true);
+      axios.get("http://localhost:3000/api/getCurrentUser")
+        .then((response) => {setUser(response.data);})
+        .catch((error) => {
+          console.error('Error getting current user:', error);
+          setUser(null);
+          localStorage.removeItem("accessToken");
+          delete axios.defaults.headers.common["Authorization"];
+        })
+        .finally(() => {
+          setisUserLoading(false);
+        });
+    } else {
+      setUser(null);
+    }
+  }, []);
+
+  async function createPost(values: { Caption: string; ImageURL: string; Tags: string; Location: string }) {
+    try {
+      const response = await axios.post("http://localhost:3000/api/createPost", values);
+      setisSuccess(true);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating post:', error);
+      setisSuccess(false);
+      return null;
+    }
+  }
+
+  // Implement HandleUpload function to upload images and access logged in user token
+  async function handleUpload(file: File) {
+    setisImageUploading(true);
+    const formData = new FormData();
+    formData.append('image', file);
+    try {
+      const response = await axios.post('http://localhost:3000/api/upload', formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      });
+      console.log('Upload successful', response.data);
+      setisImageUploading(false);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+    }
+  }
+
+   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if(token) {
+      setisPostLoading(true);
+      axios.get("http://localhost:3000/api/getRecentPosts")
+        .then((response) => {
+          setPosts(response.data);
+          setisPostLoading(false);
+        })
+        .catch((error) => {
+          console.error('Error getting posts:', error);
+          setPosts([]);
+          localStorage.removeItem("accessToken");
+        })
+        .finally(() => {
+          setisPostLoading(false);
+        });
+    } 
+   }, [posts]);
+>>>>>>> 58fd192 (FileUpload-Complete)
 
 useEffect(() => {
   const accessToken = localStorage.getItem("token");
@@ -139,6 +243,7 @@ useEffect(() => {
     return !!user;
   }
 
+<<<<<<< HEAD
   async function createPost(values: { Caption: string; ImageURL: string; Tags: string; Location: string }) {
     try {
       const response = await axios.post("http://localhost:3000/api/createPost", values);
@@ -150,6 +255,9 @@ useEffect(() => {
       return null;
     }
   }
+=======
+
+>>>>>>> 58fd192 (FileUpload-Complete)
 
   return (
     <AuthContext.Provider value={{ 
@@ -159,6 +267,7 @@ useEffect(() => {
       logout, 
       register, 
       createPost,
+      handleUpload,
       updateUser,
       isUserLoading,
       isPostLoading,

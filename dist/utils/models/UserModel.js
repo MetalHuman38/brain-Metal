@@ -95,7 +95,11 @@ Users.init({
     timestamps: false
 });
 // Define associations
+<<<<<<< HEAD
 Users.hasMany(PostModels_1.default, { foreignKey: 'PostID', as: 'posts' });
+=======
+Users.hasMany(PostModels_1.default, { foreignKey: 'PostID', as: 'post' });
+>>>>>>> 58fd192 (FileUpload-Complete)
 Users.hasMany(CommentsModel_1.default, { foreignKey: 'UserID', as: 'comments' });
 PostModels_1.default.belongsTo(Users, { foreignKey: 'PostID', as: 'creator' });
 exports.default = Users;

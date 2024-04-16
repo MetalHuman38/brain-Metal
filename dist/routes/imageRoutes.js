@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+<<<<<<< HEAD
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const UserModel_1 = __importDefault(require("../utils/models/UserModel"));
@@ -47,6 +48,22 @@ router.post('/api/upload', upload.single('image'), async (req, res) => {
         // Error handling
         console.error('Error uploading image:', err);
         res.status(500).json({ error: 'Internal server error' });
+=======
+const multexMiddleware_1 = require("../middleware/multexMiddleware");
+const cors_1 = __importDefault(require("cors"));
+const userMiddleware_1 = require("../middleware/userMiddleware");
+const router = express_1.default.Router();
+// Enable CORS for all routes
+router.use((0, cors_1.default)());
+const upload = multexMiddleware_1.upload.single('image');
+router.post('/api/upload', upload, userMiddleware_1.userMiddleware, multexMiddleware_1.uploadMiddleware, (req, res) => {
+    try {
+        res.status(201).send({ message: 'Image uploaded successfully' });
+    }
+    catch (err) {
+        console.error('Error uploading image:', err);
+        res.status(500).send({ error: 'Error uploading image' });
+>>>>>>> 58fd192 (FileUpload-Complete)
     }
 });
 exports.default = router;

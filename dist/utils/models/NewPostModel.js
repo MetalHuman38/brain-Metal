@@ -15,7 +15,11 @@ class newposts extends sequelize_1.Model {
     }
 }
 // Define the User model
+<<<<<<< HEAD
 newposts.init({
+=======
+NewPosts.init({
+>>>>>>> 58fd192 (FileUpload-Complete)
     NewPostID: {
         type: sequelize_1.DataTypes.INTEGER,
         primaryKey: true,
@@ -32,7 +36,7 @@ newposts.init({
     },
     Tags: {
         type: sequelize_1.DataTypes.TEXT,
-        allowNull: false,
+        allowNull: true,
     },
     Location: {
         type: sequelize_1.DataTypes.STRING,
@@ -50,10 +54,17 @@ newposts.init({
     timestamps: false
 });
 // Create foreign key relationship
+<<<<<<< HEAD
 newposts.belongsTo(UserModel_1.default, {
     foreignKey: 'NewPostID',
     targetKey: 'UserID',
     as: 'creator'
 });
 exports.default = newposts;
+=======
+NewPosts.belongsTo(UserModel_1.default, { foreignKey: 'NewPostID',
+    targetKey: 'UserID',
+    as: 'creator' });
+exports.default = NewPosts;
+>>>>>>> 58fd192 (FileUpload-Complete)
 //# sourceMappingURL=NewPostModel.js.map

@@ -8,8 +8,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deletePostById = exports.updatePostById = exports.getPostById = exports.getRecentPosts = exports.SavePostToDatabase = exports.createPost = void 0;
+exports.deletePostById = exports.updatePostById = exports.getPostById = exports.getRecentPosts = void 0;
 const PostModels_1 = __importDefault(require("../utils/models/PostModels"));
+<<<<<<< HEAD
 const ImageUtils_1 = require("../Uploads/ImageUtils");
 const NewPostModel_1 = __importDefault(require("../utils/models/NewPostModel"));
 // Create a new post
@@ -78,6 +79,8 @@ async function SavePostToDatabase(post) {
     }
 }
 exports.SavePostToDatabase = SavePostToDatabase;
+=======
+>>>>>>> 58fd192 (FileUpload-Complete)
 // Get Recent Posts
 const getRecentPosts = async (req, res) => {
     try {

@@ -1,15 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import { createPost, getRecentPosts, getPostById, updatePostById } from '../controllers/postController';
+import { getRecentPosts, getPostById, updatePostById } from '../controllers/postController';
 
 
 const router = express.Router();
 
 // Enable CORS for all routes
 router.use(cors());
-
-// Create a new post
-router.post('/api/createPost', createPost);
 
 // Get Recent Posts
 router.get('/api/getRecentPosts', getRecentPosts);

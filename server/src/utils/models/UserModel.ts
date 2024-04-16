@@ -2,6 +2,7 @@ import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { createSequelizeInstance } from './sequelizeCon';
 import Posts from './PostModels';
 import Comment from './CommentsModel';
+import NewPosts from './NewPostModel';
 
 interface UserAttributes {
   UserID: number;
@@ -139,8 +140,14 @@ Users.init(
 );
 
 // Define associations
+<<<<<<< HEAD
 Users.hasMany(Posts, { foreignKey: 'PostID', as: 'posts' });
 Users.hasMany(Comment, { foreignKey: 'UserID', as: 'comments' });
 Posts.belongsTo(Users, { foreignKey: 'PostID', as: 'creator' });
+=======
+Users.hasMany(Posts, { foreignKey: 'PostID', as: 'post' });
+Users.hasMany(Comment, { foreignKey:  'UserID', as: 'comments'});
+Posts.belongsTo(Users, { foreignKey:  'PostID', as: 'creator'});
+>>>>>>> 58fd192 (FileUpload-Complete)
 
 export default Users;

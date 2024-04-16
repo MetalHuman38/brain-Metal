@@ -48,7 +48,10 @@ Posts.init(
       autoIncrement: true,
       allowNull: false
     },
+<<<<<<< HEAD
     
+=======
+>>>>>>> 58fd192 (FileUpload-Complete)
       Likes: {
         type: DataTypes.INTEGER,
         allowNull: true,
@@ -61,7 +64,7 @@ Posts.init(
 
       Tags: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
 
       ImageURL: {

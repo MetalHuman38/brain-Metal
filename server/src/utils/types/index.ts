@@ -14,7 +14,11 @@ export type INavLink = {
   };
   
   export type INewPost = {
+<<<<<<< HEAD
     NewPostID: string;
+=======
+    NewPostID: number | null;
+>>>>>>> 58fd192 (FileUpload-Complete)
     caption: string;
     imageURL: string;
     location?: string;
