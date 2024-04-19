@@ -18,6 +18,19 @@ const TopBar = () => {
     if (!isSuccess) {
       // Fetch the user data from the tokenResponse in localStorage
       const tokenResponse = JSON.parse(localStorage.getItem('tokenResponse') ?? '');
+      if (tokenResponse) {
+        try {
+          const tokenResponse = JSON.parse(localStorage.getItem('tokenResponse') ?? '');
+          const { user } = tokenResponse;
+          setUserData(user);
+        } catch (error) {
+          console.error('Error parsing access token:', error);
+          // Handle parsing error gracefully, e.g., show error message to the user
+        }
+      } else {
+        console.error('Access token not found in localStorage');
+        // Handle case where access token is not found in localStorage
+      }
       const { user } = tokenResponse;
       setUserData(user);
     }

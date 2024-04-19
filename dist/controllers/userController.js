@@ -16,7 +16,7 @@ const authController_1 = require("./authController");
 const registerUser = async (req, res) => {
     try {
         // Extract user data from request body
-        const userData = req.body; // Extract user data from request body
+        const userData = req.body;
         // Hash the password using bcrypt
         const hashedPassword = await bcrypt_1.default.hash(userData.password, 10); // Adjust the salt rounds as needed
         if (!hashedPassword) {
@@ -90,6 +90,8 @@ exports.SaveUserToDatabase = SaveUserToDatabase;
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log('email', email);
+        console.log(req.body);
         // Find the user by email
         const user = await UserModel_1.default.findByEmail(email);
         if (!user) {

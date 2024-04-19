@@ -19,6 +19,10 @@ class Users extends sequelize_1.Model {
     static async findByUserId(UserID) {
         return await this.findByPk(UserID);
     }
+    // Create custom class method to find Image URL
+    static async findImageURL(ImageURL) {
+        return await this.findOne({ where: { ImageURL: ImageURL } });
+    }
 }
 // Define the User model
 Users.init({

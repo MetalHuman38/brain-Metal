@@ -22,6 +22,30 @@ app.use((0, cookie_parser_1.default)());
 app.use(express_1.default.urlencoded({ extended: true }));
 // Use the router for all routes
 app.use(router_1.default);
+// Error handler middleware
+app.use(async (req, res, next) => {
+    try {
+        const error = CreateError(404, 'API route not found');
+        throw error;
+    }
+    catch (err) {
+        next(err);
+    }
+});
+app.use(async (err, req, res, next) => {
+    try {
+        res.status(err.status || 500);
+        res.send({
+            error: {
+                status: err.status || 500,
+                message: err.message,
+            },
+        });
+    }
+    catch (err) {
+        next(err);
+    }
+});
 // Start the server
 async function startServer() {
     try {
@@ -42,4 +66,7 @@ server.on('clientError', (err, socket) => {
     socket.destroy(); // Destroy the socket to prevent further events
 });
 startServer();
+function CreateError(arg0, arg1) {
+    throw new Error('Function not implemented.');
+}
 //# sourceMappingURL=server.js.map

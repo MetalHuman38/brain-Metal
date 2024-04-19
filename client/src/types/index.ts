@@ -14,7 +14,7 @@ export type INavLink = {
   };
 
   export type INewPost = {
-    CreatorID: number | null;
+    PostID: number | null;
     Caption?: string;
     ImageURL?: string;
     Location?: string;
@@ -22,13 +22,14 @@ export type INavLink = {
   };
   
   export type IUpdatePost = {
-    postId: string;
-    caption: string;
-    imageId: string;
-    imageUrl: URL;
-    file: File[];
-    location?: string;
-    tags?: string;
+    PostID: number;
+    Likes: number;
+    Caption: string;
+    Tags: string;
+    ImageURL: string;
+    Location: string;
+    CreatedAt: Date;
+    UpdatedAt: Date;
   };
   
   export type IUser = {

@@ -2,7 +2,10 @@ import { Request, Response } from 'express'; // Import the Request and Response 
 import multer from 'multer';
 import path from 'path';
 import Users from '../utils/models/UserModel';
-import { userMiddleware } from './userMiddleware';
+import NewPosts from '../utils/models/NewPostModel';
+import dbConfig, { waitForDB } from '../utils/dbConfig';
+import sequelize from 'sequelize/types/sequelize';
+
 
 
 // Define custom destination directory
@@ -25,18 +28,28 @@ const uploadMiddleware = async (req: Request, res: Response) => {
       // Return a success message
       const imageUrl = path.join(uploadDir, req.file.filename);
       console.log('Image URL:', imageUrl);
-      // Save the image URL to the database
 
+      // Get the Sequelize instance
+      const sequelize = await waitForDB();
+
+      // Construct the SQL query to insert the image URL into the NewPosts table
+      const query = `INSERT INTO ImageStorage (ImageURL) VALUES ('${imageUrl}')`;
+
+      // Execute the raw query using the Sequelize instance
+      await sequelize.query(query);
+
+      
       const user = await Users.findOne({ where: { UserID: req.currentUser?.UserID } });
+
       if (!user) {
         console.error('User not found');
         res.status(404).send({ error: 'User not found' });
         return;
       }
-
       // Update the user's profile picture
       await user.update({ ImageURL: imageUrl });
 
+    
       console.log('Image uploaded successfully:', imageUrl);
       res.status(201).send({ message: 'Image uploaded successfully' });
     } else {

@@ -6,7 +6,7 @@ import Users from '../utils/models/UserModel';
 declare global {
     namespace Express {
       interface Request {
-        currentUser?: { UserID: number };
+        currentUser?: { UserID: number};
       }
     }
   }
@@ -17,9 +17,10 @@ export const userMiddleware = async (req: Request, res: Response, next: NextFunc
         const token = req.headers.authorization?.split(' ')[1]; // Add a check for undefined
         if (token) {
             const decoded = jwt.verify(token, process.env.JWT_SECRET as string)as { UserID: number };
-            const  user = await Users.findByPk(decoded.UserID as number);
+            console.log('decoded', decoded);
+            const  user = await Users.findByPk(decoded.UserID);
             if (user){
-                req.currentUser = user;
+                req.currentUser = { UserID: decoded.UserID };;
             } else {
                 console.error('user not found');
                 res.status(401).send({ error: 'Unauthorized' });

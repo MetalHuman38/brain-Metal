@@ -8,8 +8,8 @@ async function getUsers() {
         // Get Sequelize instance from waitForDB
         const sequelize = await (0, dbConfig_1.waitForDB)();
         // Execute raw SQL query to fetch users
-        const post = await sequelize.query("SELECT * FROM Posts", { type: sequelize_1.QueryTypes.SELECT });
-        return post;
+        const user = await sequelize.query("SELECT * FROM Users", { type: sequelize_1.QueryTypes.SELECT });
+        return user;
     }
     catch (error) {
         throw new Error(`Error getting posts: ${error}`);
@@ -17,8 +17,8 @@ async function getUsers() {
 }
 // Test the getUsers function
 getUsers()
-    .then((post) => {
-    console.log('Posts:', post);
+    .then((user) => {
+    console.log('Users:', user);
 })
     .catch((error) => {
     console.error(error.message);

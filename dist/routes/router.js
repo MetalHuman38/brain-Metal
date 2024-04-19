@@ -14,7 +14,10 @@ const postRoutes_1 = __importDefault(require("./postRoutes"));
 const likesRoutes_1 = __importDefault(require("./likesRoutes"));
 const commentRoutes_1 = __importDefault(require("./commentRoutes"));
 const imageRoutes_1 = __importDefault(require("./imageRoutes"));
+const cors_1 = __importDefault(require("cors"));
 const router = express_1.default.Router();
+// Enable CORS for all routes
+router.use((0, cors_1.default)());
 router.use(authRoutes_1.default);
 // Use the user router for handling user-related routes
 router.use(userRoutes_1.default);

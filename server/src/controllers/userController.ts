@@ -15,7 +15,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
   try {
 
     // Extract user data from request body
-    const userData: INewUser = req.body;  // Extract user data from request body
+    const userData: INewUser = req.body;
 
     // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(userData.password, 10); // Adjust the salt rounds as needed
@@ -119,6 +119,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   try { 
     
     const { email, password } = req.body;
+    console.log('email', email);
+    console.log(req.body);
 
     // Find the user by email
     const user = await Users.findByEmail(email);

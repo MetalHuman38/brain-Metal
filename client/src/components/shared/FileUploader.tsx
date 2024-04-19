@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react'
 import { FileWithPath, useDropzone } from 'react-dropzone'
 import { Button } from '../ui/button'
-import axios from 'axios';
+import instance from '../../lib/axiosConfig'
 
 type FileUpLoaderProps = {
   fieldChange: (FILES: File[]) => void;
@@ -34,7 +34,7 @@ const FileUpLoader = ({fieldChange, mediaUrl}: FileUpLoaderProps) => {
     const formData = new FormData();
     formData.append('image', file);
     try {
-      const response = await axios.post('http://localhost:3000/api/upload', formData, {
+      const response = await instance.post('/upload', formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
         },

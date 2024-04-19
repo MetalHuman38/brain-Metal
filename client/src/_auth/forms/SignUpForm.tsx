@@ -11,7 +11,7 @@ import { SignUpValidation } from "@/lib/validation"
 import Loader from "@/components/shared/Loader"
 import { Link } from "react-router-dom"
 import { useToast } from "@/components/ui/use-toast"
-import axios from "axios"
+import instance from "@/lib/axiosConfig"
 
  
 
@@ -37,7 +37,7 @@ const SignUpForm = () => {
 
     setIsLoading(true);
       // const response = await axios.post("/api/register", values)
-    const newUser = await axios.post("http://localhost:3000/api/register", values);
+    const newUser = await instance.post("/register", values);
 
     if (!newUser) {
       return toast({

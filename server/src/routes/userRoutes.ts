@@ -1,7 +1,8 @@
 import express from 'express';
 import { getCurrentUser, loginUser, logoutUser, registerUser } from '../controllers/userController';
 import cors from 'cors';
-import { authenticate } from '../middleware/authMiddleware';
+import { authenticate, authorize } from '../middleware/authMiddleware';
+import { userMiddleware } from '../middleware/userMiddleware';
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.post('/api/register', registerUser);
 router.post('/api/login', loginUser);
 
 // Define the route for getting the current user with JWT authentication middleware
-router.get('/api/getCurrentUser', authenticate, getCurrentUser)
+router.get('/api/getCurrentUser', userMiddleware, getCurrentUser)
 
 // Define the route for user logout with JWT authentication middleware
 router.post('/api/logoutUser', authenticate, logoutUser);

@@ -28,13 +28,15 @@ class Posts extends Model<PostAttributes, PostCreationAttributes> implements Pos
   public CreatedAt: Date | undefined;
   public UpdatedAt: Date | undefined;
 
-  static async findAllUserPosts(postID: number): Promise<Posts[]> {
+  static async findUserPost(PostID: number): Promise<Posts | null> {
+    return await this.findByPk(PostID);
+  }
+
+  static async findAllUserPosts(PostID: number): Promise<Posts[]> {
     return await this.findAll({
       where: {
-        PostID: postID
+        PostID: PostID
       },
-      order: [['CreatedAt', 'DESC']],
-      limit: 10
     });
   }
 }

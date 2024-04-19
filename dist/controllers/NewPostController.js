@@ -19,7 +19,7 @@ const createPost = async (req, res) => {
             CreatedAt: new Date()
         });
         if (!Newpost) {
-            res.status(400).json({ message: 'Error creating user account.' });
+            res.status(400).json({ message: 'Error creating new post.' });
             return;
         }
         // Create a new post object
@@ -28,7 +28,7 @@ const createPost = async (req, res) => {
             Likes: 0,
             Caption: post.caption,
             Tags: post.tags || '',
-            ImageURL: req.file ? req.file.path : null,
+            ImageURL: post.imageURL || null,
             Location: post.location || null,
             CreatedAt: new Date(),
             UpdatedAt: new Date()

@@ -9,9 +9,13 @@ import postRoutes from './postRoutes';
 import likesRoutes from './likesRoutes';
 import commentRoutes from './commentRoutes';
 import imageRoutes from './imageRoutes';
+import cors from 'cors';
+
 
 const router = express.Router();
 
+// Enable CORS for all routes
+router.use(cors());
 
 router.use(authRoutes);
 
@@ -46,5 +50,6 @@ router.get('/Get-User', async (req: Request, res: Response) => {
         res.status(500).send('Error connecting to the database.');
     }
 });
+
 
 export default router;

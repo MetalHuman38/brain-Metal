@@ -1,0 +1,27 @@
+### Health Check
+
+Send Request: GET http://localhost:3000
+
+### Message Endpoint
+http://localhost:3000/set-cookies
+
+### Message Endpoint    
+http://localhost:3000/api/getPosts?UserID=26
+
+
+### Login Endpoint
+http://localhost:3000/api/getCurrentUser
+
+
+### Login Endpoint
+
+http://localhost:3000/api/getPosts?UserID=${userData?.UserID}
+
+### Login Endpoint
+http://localhost:3000/api/login
+
+
+### Login Endpoint
+http://localhost:3000/api/getPosts?UserID=26
+
+

@@ -12,9 +12,11 @@ const userMiddleware = async (req, res, next) => {
         const token = req.headers.authorization?.split(' ')[1]; // Add a check for undefined
         if (token) {
             const decoded = jsonwebtoken_1.default.verify(token, process.env.JWT_SECRET);
+            console.log('decoded', decoded);
             const user = await UserModel_1.default.findByPk(decoded.UserID);
             if (user) {
-                req.currentUser = user;
+                req.currentUser = { UserID: decoded.UserID };
+                ;
             }
             else {
                 console.error('user not found');

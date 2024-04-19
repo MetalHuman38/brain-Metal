@@ -4,6 +4,7 @@ import cors from 'cors';
 import { userMiddleware } from '../middleware/userMiddleware';
 
 
+
 const router = express.Router();
 
 // Enable CORS for all routes

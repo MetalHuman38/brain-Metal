@@ -1,6 +1,0 @@
-### Health Check
-
-Send Request: GET http://localhost:3000/health
-
-### Message Endpoint
-Send Request: GET http://localhost:3000/message

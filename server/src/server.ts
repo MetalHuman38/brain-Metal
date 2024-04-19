@@ -15,12 +15,38 @@ app.use((req, res, next) => {
   next();
 });
 
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // Use the router for all routes
 app.use(router);
+
+// Error handler middleware
+app.use(async (req, res, next) => {
+  try {
+      const error = CreateError(404, 'API route not found');
+      throw error;
+  } catch (err) {
+      next(err);
+  }
+});
+
+app.use(async (err: any, req: any, res: any, next: any) => {
+  try {
+    res.status(err.status || 500);
+    res.send({
+      error: {
+        status: err.status || 500,
+        message: err.message,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 
 // Start the server
 async function startServer() {
@@ -42,6 +68,11 @@ async function startServer() {
     socket.destroy(); // Destroy the socket to prevent further events
   });
 
- 
 startServer();
+
+
+
+function CreateError(arg0: number, arg1: string) {
+  throw new Error('Function not implemented.');
+}
 

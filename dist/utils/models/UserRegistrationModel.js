@@ -46,7 +46,10 @@ UserRegistrations.init({
         unique: true,
         validate: {
             isEmail: true,
-            len: [5, 50]
+            len: [5, 50],
+            isIP: true,
+            isIPv6: true,
+            notEmpty: true,
         }
     },
     HashedPassword: {

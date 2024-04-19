@@ -8,17 +8,18 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
     try {
         const post: INewPost = req.body;
 
+
         const Newpost = await NewPosts.createPost({
             NewPostID: 0,
             Caption: post.caption,
-            ImageURL: req.file ? req.file.path : null,
+            ImageURL:  req.file ? req.file.path : null,
             Location: post.location || null,
             Tags: post.tags || '',
             CreatedAt: new Date()
         });
 
         if (!Newpost) {
-            res.status(400).json({ message: 'Error creating user account.' });
+            res.status(400).json({ message: 'Error creating new post.' });
             return;
         }
 
@@ -28,7 +29,7 @@ export const createPost = async (req: Request, res: Response): Promise<void> => 
             Likes: 0,
             Caption: post.caption,
             Tags: post.tags || '',
-            ImageURL: req.file ? req.file.path : null,
+            ImageURL: post.imageURL || null,
             Location: post.location || null,
             CreatedAt: new Date(),
             UpdatedAt: new Date()
@@ -69,6 +70,7 @@ export const savePostToDatabase = async (posts: {
             Location: posts.Location || null,
             CreatedAt: new Date(),
             UpdatedAt: new Date()
+
         });
         return newPost;
     } catch (error) {
@@ -76,3 +78,4 @@ export const savePostToDatabase = async (posts: {
         return null;
     }
 };
+

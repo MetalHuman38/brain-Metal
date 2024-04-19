@@ -2,7 +2,7 @@ import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { createSequelizeInstance } from './sequelizeCon';
 import Posts from './PostModels';
 import Comment from './CommentsModel';
-import NewPosts from './NewPostModel';
+
 
 interface UserAttributes {
   UserID: number;
@@ -26,6 +26,7 @@ interface UserCreationAttributes extends Optional<UserAttributes, 'UserID'> {}
 const sequelize = createSequelizeInstance();
 
 class Users extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  
   public UserID!: number;
   public MemberName!: string | null;
   public Username!: string;
@@ -39,7 +40,7 @@ class Users extends Model<UserAttributes, UserCreationAttributes> implements Use
   public Label!: string | null;
   public Last_activity!: Date | undefined;
   public Updated_at: Date | undefined;
-  
+
 
   static async createUser(userData: UserCreationAttributes): Promise<Users> {
     return await this.create(userData);
@@ -51,6 +52,11 @@ class Users extends Model<UserAttributes, UserCreationAttributes> implements Use
 
   static async findByUserId(UserID: string): Promise<Users | null> {
     return await this.findByPk(UserID);
+  }
+
+  // Create custom class method to find Image URL
+  static async findImageURL(ImageURL: string): Promise<Users | null> {
+    return await this.findOne({ where: { ImageURL: ImageURL } });
   }
 
 }

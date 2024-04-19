@@ -13,6 +13,19 @@ class NewPosts extends sequelize_1.Model {
     static async createPost(attributes) {
         return await this.create(attributes);
     }
+    // Create custom class to Update ImageURL column in NewPost Table
+    static async updateImageURL(NewPostID, ImageURL) {
+        const post = await this.findByPk(NewPostID);
+        if (post) {
+            post.ImageURL = ImageURL;
+            await post.save();
+        }
+        return post;
+    }
+    // Create Static method to fetch all new posts by ID
+    static async getNewPostByID(NewPostID) {
+        return await this.findByPk(NewPostID);
+    }
 }
 // Define the User model
 NewPosts.init({

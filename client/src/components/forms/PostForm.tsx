@@ -10,7 +10,7 @@ import FileUpLoader from "../shared/FileUploader"
 import { PostValidation } from "@/lib/validation"
 import { useUserContext } from "@/lib/context/AuthContext"
 import { useToast } from "../ui/use-toast"
-import axios from "axios";
+import instance from "@/lib/axiosConfig"
 import { useState } from "react";
 
 
@@ -21,14 +21,14 @@ const PostForm = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [posts, setPost] = useState();
-  
+ 
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof PostValidation>>({
     resolver: zodResolver(PostValidation),
     defaultValues: {
       caption: posts ? posts?.caption : "",
-      file: [],
+      file: [], 
       location: posts ? posts?.location : "",
       tags: posts ? posts.tags.join(',') : "",
     },
@@ -38,8 +38,8 @@ const PostForm = () => {
   async function onSubmit(values: z.infer<typeof PostValidation>) {
     try {
       setisPostLoading(true);
-      const newPost = await axios.post("http://localhost:3000/api/createPost", values);
-      console.log(newPost.data)
+      const newPost = await instance.post("/createPost", values);
+      console.log(newPost);
       console.log(newPost);
       toast({
         title: 'Post created successfully',
@@ -54,6 +54,7 @@ const PostForm = () => {
       setisPostLoading(false);
     }
   }
+
   return (
       <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-9 w-full max-w-5xl">

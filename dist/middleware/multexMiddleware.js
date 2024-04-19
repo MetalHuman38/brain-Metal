@@ -7,6 +7,7 @@ exports.upload = exports.uploadMiddleware = void 0;
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const UserModel_1 = __importDefault(require("../utils/models/UserModel"));
+const dbConfig_1 = require("../utils/dbConfig");
 // Define custom destination directory
 const uploadDir = '/home/bkalejaiye/brainv3/server/src/utils/Uploads';
 const storage = multer_1.default.diskStorage({
@@ -25,7 +26,12 @@ const uploadMiddleware = async (req, res) => {
             // Return a success message
             const imageUrl = path_1.default.join(uploadDir, req.file.filename);
             console.log('Image URL:', imageUrl);
-            // Save the image URL to the database
+            // Get the Sequelize instance
+            const sequelize = await (0, dbConfig_1.waitForDB)();
+            // Construct the SQL query to insert the image URL into the NewPosts table
+            const query = `INSERT INTO ImageStorage (ImageURL) VALUES ('${imageUrl}')`;
+            // Execute the raw query using the Sequelize instance
+            await sequelize.query(query);
             const user = await UserModel_1.default.findOne({ where: { UserID: req.currentUser?.UserID } });
             if (!user) {
                 console.error('User not found');

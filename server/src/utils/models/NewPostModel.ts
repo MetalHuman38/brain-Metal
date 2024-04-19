@@ -30,6 +30,21 @@ class NewPosts extends Model<NewPostAttributes, NewPostCreationAttributes> imple
     return await this.create(attributes);
   }
 
+  // Create custom class to Update ImageURL column in NewPost Table
+  static async updateImageURL(NewPostID: number, ImageURL: string): Promise<NewPosts | null> {
+    const post = await this.findByPk(NewPostID);
+    if (post) {
+      post.ImageURL = ImageURL;
+      await post.save();
+    }
+    return post;
+  }
+
+  // Create Static method to fetch all new posts by ID
+  static async getNewPostByID(NewPostID: number): Promise<NewPosts | null> {
+    return await this.findByPk(NewPostID);
+  }
+
 }
 
 // Define the User model
