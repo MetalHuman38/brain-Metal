@@ -10,15 +10,24 @@ import { IUser } from "@/types";
 const Home = () => {
   const { user, isUserLoading } = useAuth();
   const [userData, setUserData] = useState<IUser | null>(null);
-  const { data: posts, isLoading: isPostLoading } = useQuery(['posts', userData], async () => {
-    const response = await instance.get(`/getPosts?UserID=${user?.UserID}`);
-    return response.data;
-  });
 
   useEffect(() => {
     if (!user) return; // Exit early if user is not defined
     setUserData(user);
   }, [user]);
+
+  const { data: posts, isLoading: isPostLoading, refetch: fetchPosts } = useQuery(['posts', user], async () => {
+    if (user) {
+      const response = await instance.get(`/getPosts?UserID=${user.UserID}`);
+      return response.data;
+    }
+  });
+
+  useEffect(() => {
+    if(user && !posts)
+    fetchPosts();
+  }
+  , [user, fetchPosts]);
 
   if (isUserLoading || !userData) {
     // Render a loading indicator or placeholder content

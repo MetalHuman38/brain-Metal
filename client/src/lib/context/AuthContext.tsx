@@ -103,11 +103,14 @@ useEffect(() => {
   // Implement useEffect to get recent posts
 useEffect(() => {
   const fetchPosts = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const accessToken = localStorage.getItem("accessToken");
+    if (accessToken) {
       setisPostLoading(true);
       try {
         const newPosts = await instance.get("/getPosts");
+        headers: {
+          Authorization: `Bearer ${accessToken}`;
+        }
         setPosts(newPosts.data);
       } catch (error) {
         console.error('Error getting posts:', error);
