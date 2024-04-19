@@ -3,7 +3,7 @@
 Send Request: GET http://localhost:3000
 
 ### Message Endpoint
-http://localhost:3000/set-cookies
+http://localhost:3000/refreshToken
 
 ### Message Endpoint    
 http://localhost:3000/api/getPosts?UserID=26

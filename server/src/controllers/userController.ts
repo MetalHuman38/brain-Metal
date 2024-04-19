@@ -8,6 +8,10 @@ import Users from '../utils/models/UserModel';
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 import { generateToken } from './authController';
+import { refreshToken } from './authController';
+import path from 'path';
+
+// import User.json from '../models/User.json';
 
 
 // Controller function to handle user registration
@@ -16,7 +20,10 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
     // Extract user data from request body
     const userData: INewUser = req.body;
-
+    if (!userData) {
+      res.status(400).json({ message: 'Invalid user data' });
+      return;
+    }
     // Hash the password using bcrypt
     const hashedPassword = await bcrypt.hash(userData.password, 10); // Adjust the salt rounds as needed
 
@@ -55,7 +62,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       Label: null,
       LastActivity: null,
       UpdatedAt: new Date(),
-      
+      refreshToken: [""]
     });
 
 
@@ -63,7 +70,14 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       res.status(400).json({ message: 'Error creating user account.' });
       return newUser;
     }
-    
+
+    // Check for duplicate username in Database
+    const duplicateUsername = await Users.findUsername(userData.username);
+    if (duplicateUsername) {
+      res.status(400).json({ message: 'Username already exists' });
+      return;
+    }
+
     res.status(200).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('Error registering user:', error);
@@ -86,6 +100,7 @@ export async function SaveUserToDatabase(user: {
   Label?: string | null;
   LastActivity: Date | null;
   UpdatedAt: Date;
+  refreshToken: [string];
   
 }) {
   try{
@@ -104,6 +119,7 @@ export async function SaveUserToDatabase(user: {
       Join: user.Join,
       Last_activity: user.LastActivity === null ? undefined : user.LastActivity, 
       Updated_at: user.UpdatedAt, 
+      refreshToken: user.refreshToken
       
     });
     return newUser;
@@ -140,11 +156,29 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Generate JWT token for the user
-    const token = generateToken(user.UserID); // Issue token for the logged in user
-    res.cookie('accessToken', token, { httpOnly: true, secure: true, sameSite: 'none' });
+    const accessToken = generateToken(user.UserID); // Issue token for the logged in user
+
+    const refresh = refreshToken(user.UserID);
+
+    // Create a object to store the token in the database
+    const saveToken = async (UserID: number, refreshToken: string) => {
+      const user = await Users.findByPk(UserID);
+      if (!user) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+      }
+      user.refreshToken = [refreshToken];
+      await user.save();
+    };
+
+    await saveToken(user.UserID, refresh);
+    
+    res.cookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'none' });
+    res.cookie('refreshToken', refresh, { httpOnly: true, secure: true, sameSite: 'none' });
     
     const tokenResponse = {
-      token,
+      accessToken,
+      refreshToken: refresh,
       user: {
         UserID: user.UserID,
         MemberName: user.MemberName,
@@ -164,26 +198,23 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export function getCurrentUser (req: Request, res: Response): void {
+export async function getCurrentUser (req: Request, res: Response): Promise<void> {
   try {
   
     const token = req.cookies.accessToken;
-
     if (!token){
          res.status(401).json({ message: 'Unauthrized: No Token provided' });
           return;
       };
 
     const verified = jwt.verify(token, process.env.JWT_SECRET as string);
-
     if (!verified) {
         res.status(401).json({ message: 'Unauthrized: Invalid Token' });
         return;
     }
 
     const UserID = (verified as { user: { UserID: string } }).user.UserID;
-
-    const user = Users.findByUserId(UserID);
+    const user = await Users.findByPk(UserID);
 
     if (!user) {
         res.status(404).json({ message: 'User not found' });
@@ -211,3 +242,4 @@ export const logoutUser = async (req: Request, res: Response): Promise<void> => 
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+

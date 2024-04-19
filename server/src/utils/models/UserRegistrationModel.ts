@@ -34,6 +34,11 @@ class UserRegistrations extends Model<UserAttributes, UserCreationAttributes> im
     return await this.create({ NewUser: name, Username: username, Email: email, HashedPassword: password });
   }
 
+  // Create a customer class that uses promise to save a new user to user.json file
+  static async saveUserToDatabase(user: UserCreationAttributes): Promise<UserRegistrations> {
+    return await this.create(user);
+  }
+
 }
 // Define the User model
 UserRegistrations.init(

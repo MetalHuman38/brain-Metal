@@ -16,7 +16,7 @@ router.post('/api/register', registerUser);
 router.post('/api/login', loginUser);
 
 // Define the route for getting the current user with JWT authentication middleware
-router.get('/api/getCurrentUser', userMiddleware, getCurrentUser)
+router.get('/api/getCurrentUser', getCurrentUser)
 
 // Define the route for user logout with JWT authentication middleware
 router.post('/api/logoutUser', authenticate, logoutUser);

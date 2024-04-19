@@ -8,6 +8,7 @@ require("dotenv/config");
 const router_1 = __importDefault(require("./routes/router"));
 const http_1 = __importDefault(require("http"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const path_1 = __importDefault(require("path"));
 const app = (0, express_1.default)();
 // Cors middleware
 app.use((req, res, next) => {
@@ -17,9 +18,10 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     next();
 });
+app.use(express_1.default.urlencoded({ extended: false }));
 app.use(express_1.default.json());
+app.use(express_1.default.static(path_1.default.join(__dirname, '/dist')));
 app.use((0, cookie_parser_1.default)());
-app.use(express_1.default.urlencoded({ extended: true }));
 // Use the router for all routes
 app.use(router_1.default);
 // Error handler middleware

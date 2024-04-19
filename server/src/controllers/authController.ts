@@ -24,6 +24,7 @@ export function getTokenCurrentUser(token: string): any {
     return jwt.verify(token, process.env.JWT_SECRET as string);
 }
 
+
 // Function to refresh JWT token
 export function refreshToken(UserID: number): string {
     const token = jwt.sign({ UserID }, process.env.JWT_SECRET as string, { expiresIn: maxAge });

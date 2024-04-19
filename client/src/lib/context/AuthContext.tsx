@@ -62,7 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 
 useEffect(() => {
-  const accessToken = localStorage.getItem("token");
+  const accessToken = localStorage.getItem("refreshToken");
   if (accessToken) {
     instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
   }
@@ -72,17 +72,13 @@ useEffect(() => {
   async function login(values: { email: string; password: string }) {
     try {
       const response = await instance.post("/login", values, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
-        },
       });
       if (response.data.error) {
         console.error('Error logging in user:', response.data.error);
         return;
       }
-      const { tokenResponse } = response.data;
-      const { user, token } = tokenResponse;
-      localStorage.setItem("tokenResponse", JSON.stringify(tokenResponse));  
+      const { user, token } = response.data;
+      localStorage.setItem("tokenResponse", JSON.stringify(response.data));  
       setUser(user);
       localStorage.setItem("accessToken", token);
       instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;

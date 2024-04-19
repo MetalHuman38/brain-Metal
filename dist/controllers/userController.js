@@ -12,11 +12,17 @@ const UserModel_1 = __importDefault(require("../utils/models/UserModel"));
 require("dotenv/config");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const authController_1 = require("./authController");
+const authController_2 = require("./authController");
+// import User.json from '../models/User.json';
 // Controller function to handle user registration
 const registerUser = async (req, res) => {
     try {
         // Extract user data from request body
         const userData = req.body;
+        if (!userData) {
+            res.status(400).json({ message: 'Invalid user data' });
+            return;
+        }
         // Hash the password using bcrypt
         const hashedPassword = await bcrypt_1.default.hash(userData.password, 10); // Adjust the salt rounds as needed
         if (!hashedPassword) {
@@ -46,10 +52,17 @@ const registerUser = async (req, res) => {
             Label: null,
             LastActivity: null,
             UpdatedAt: new Date(),
+            refreshToken: [""]
         });
         if (!newUser) {
             res.status(400).json({ message: 'Error creating user account.' });
             return newUser;
+        }
+        // Check for duplicate username in Database
+        const duplicateUsername = await UserModel_1.default.findUsername(userData.username);
+        if (duplicateUsername) {
+            res.status(400).json({ message: 'Username already exists' });
+            return;
         }
         res.status(200).json({ message: 'User registered successfully' });
     }
@@ -77,6 +90,7 @@ async function SaveUserToDatabase(user) {
             Join: user.Join,
             Last_activity: user.LastActivity === null ? undefined : user.LastActivity,
             Updated_at: user.UpdatedAt,
+            refreshToken: user.refreshToken
         });
         return newUser;
     }
@@ -106,10 +120,24 @@ const loginUser = async (req, res) => {
             return;
         }
         // Generate JWT token for the user
-        const token = (0, authController_1.generateToken)(user.UserID); // Issue token for the logged in user
-        res.cookie('accessToken', token, { httpOnly: true, secure: true, sameSite: 'none' });
+        const accessToken = (0, authController_1.generateToken)(user.UserID); // Issue token for the logged in user
+        const refresh = (0, authController_2.refreshToken)(user.UserID);
+        // Create a object to store the token in the database
+        const saveToken = async (UserID, refreshToken) => {
+            const user = await UserModel_1.default.findByPk(UserID);
+            if (!user) {
+                res.status(404).json({ message: 'User not found' });
+                return;
+            }
+            user.refreshToken = [refreshToken];
+            await user.save();
+        };
+        await saveToken(user.UserID, refresh);
+        res.cookie('accessToken', accessToken, { httpOnly: true, secure: true, sameSite: 'none' });
+        res.cookie('refreshToken', refresh, { httpOnly: true, secure: true, sameSite: 'none' });
         const tokenResponse = {
-            token,
+            accessToken,
+            refreshToken: refresh,
             user: {
                 UserID: user.UserID,
                 MemberName: user.MemberName,
@@ -128,7 +156,7 @@ const loginUser = async (req, res) => {
     }
 };
 exports.loginUser = loginUser;
-function getCurrentUser(req, res) {
+async function getCurrentUser(req, res) {
     try {
         const token = req.cookies.accessToken;
         if (!token) {
@@ -142,7 +170,7 @@ function getCurrentUser(req, res) {
             return;
         }
         const UserID = verified.user.UserID;
-        const user = UserModel_1.default.findByUserId(UserID);
+        const user = await UserModel_1.default.findByPk(UserID);
         if (!user) {
             res.status(404).json({ message: 'User not found' });
             return;

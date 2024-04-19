@@ -3,6 +3,7 @@ import 'dotenv/config';
 import router from './routes/router';
 import http from 'http';
 import cookieParser from 'cookie-parser';
+import path from 'path';
 
 const app = express();
 
@@ -15,10 +16,11 @@ app.use((req, res, next) => {
   next();
 });
 
-
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, '/dist')));
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
+
 
 // Use the router for all routes
 app.use(router);
