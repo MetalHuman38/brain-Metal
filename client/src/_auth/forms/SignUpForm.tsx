@@ -36,9 +36,8 @@ const SignUpForm = () => {
     try{
 
     setIsLoading(true);
-      // const response = await axios.post("/api/register", values)
-    const newUser = await instance.post("/register", values);
-
+    const newUser = await instance.post("/handleRegister", values);
+    
     if (!newUser) {
       return toast({
         title: "Sign Up failed. Please try again.",

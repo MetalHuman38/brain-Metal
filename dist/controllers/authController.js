@@ -41,7 +41,6 @@ function clearToken() {
 exports.clearToken = clearToken;
 exports.default = { generateToken,
     verifyToken,
-    refreshToken,
     clearToken,
     getTokenCurrentUser
 };

@@ -28,15 +28,6 @@ router.post('/api/verifyToken', (req, res) => {
     // Send the decoded token in the response
     res.status(200).json({ decoded });
 });
-// Define the route for refreshing JWT tokens (e.g., user refresh token)
-router.post('/api/refreshToken', (req, res) => {
-    // Extract the user ID from the request body
-    const { UserID } = req.body;
-    // Refresh the JWT token
-    const token = authController_1.default.refreshToken(UserID);
-    // Send the token in the response
-    res.status(200).json({ token });
-});
 // Define the route for clearing JWT tokens (e.g., user logout)
 router.post('/api/clearToken', (req, res) => {
     // Clear the JWT token

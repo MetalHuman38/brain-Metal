@@ -4,17 +4,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const userRegisController_1 = require("../controllers/userRegisController");
 const cors_1 = __importDefault(require("cors"));
-const postController_1 = require("../controllers/postController");
-// Create a new router
 const router = express_1.default.Router();
 // Enable CORS for all routes
 router.use((0, cors_1.default)());
-// Get post by ID
-router.get('/getPosts', postController_1.getPostById);
-// Get Recent Posts
-router.get('/getRecentPosts', postController_1.getRecentPosts);
-// Update post by ID
-router.put('/api/updatePostById', postController_1.updatePostById);
+// Define the route for user registration
+router.post('/api/register', userRegisController_1.registerUser);
 exports.default = router;
-//# sourceMappingURL=postRoutes.js.map
+//# sourceMappingURL=userRegisRoutes.js.map

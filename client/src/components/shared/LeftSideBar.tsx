@@ -1,21 +1,25 @@
 import { sidebarLinks } from '@/constants';
 import { useUserContext } from '@/lib/context/AuthContext';
 import { INavLink } from '@/types';
-import { useEffect, useState } from 'react';
-import { Link, NavLink, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
+import useAuth from '@/lib/context/useAuth';
 
 const LeftSideBar = () => {
-  const { logout, setisUserLoading, isUserLoading } = useUserContext();
-  const [userData, setUserData] = useState(null);
+  const { logout } = useUserContext();
+  const { user, isUserLoading } = useAuth();
   const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isUserLoading) {
-      // Fetch the user data from the tokenResponse in localStorage
-      const tokenResponse = JSON.parse(localStorage.getItem('tokenResponse') ?? '');
-      const { user } = tokenResponse;
-      setUserData(user);
+    if (!isUserLoading && !user) {
+
+      try {
+        navigate('/');
+      } catch (error) {
+        console.error('Error parsing access token:', error);
+      }
     }
   }, [isUserLoading]);
 
@@ -30,14 +34,14 @@ const LeftSideBar = () => {
             height={36}
           />
         </Link>
-        {isUserLoading || !userData ? (
+        {isUserLoading || !user ? (
           <p>Loading user data...</p>
         ) : (
-          <Link to={`/profile/${userData?.UserID}`}>
-            <img src={userData?.AvatarUrl || '/assets/images/owner.jpg'} alt='profile' className='h-14 w-14 rounded-full' />
+          <Link to={`/profile/${user?.UserID}`}>
+            <img src={user?.AvatarUrl || '/assets/images/owner.jpg'} alt='profile' className='h-14 w-14 rounded-full' />
             <div className='flex flex-col'>
-              <p className='body-bold'>{userData?.MemberName}</p>
-              <p>@{userData?.Username}</p>
+              <p className='body-bold'>{user?.MemberName}</p>
+              <p>@{user?.Username}</p>
             </div>
           </Link>
         )}

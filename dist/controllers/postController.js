@@ -22,10 +22,22 @@ exports.getRecentPosts = getRecentPosts;
 // Get post by ID
 const getPostById = async (req, res) => {
     try {
-        const { PostID } = req.params;
-        const { UserID } = req.params;
+        const PostID = req.params.PostID;
+        const UserID = req.params.UserID;
         if (!UserID) {
             res.status(401).json({ message: 'Unauthorized' });
+            return;
+        }
+        if (!PostID) {
+            res.status(400).json({ message: 'PostID is required' });
+            return;
+        }
+        if (!req.params.UserID) {
+            res.status(400).json({ message: 'UserID is required' });
+            return;
+        }
+        if (!req.params.PostID) {
+            res.status(400).json({ message: 'PostID is required' });
             return;
         }
         // Get the Sequelize instance

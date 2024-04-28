@@ -27,10 +27,6 @@ class Users extends sequelize_1.Model {
     static async findUsername(Username) {
         return await this.findOne({ where: { Username: Username } });
     }
-    // Create custom class to find refresh token
-    static async findRefreshToken(refreshToken) {
-        return await this.findOne({ where: { refreshToken: refreshToken } });
-    }
 }
 // Define the User model
 Users.init({
@@ -99,10 +95,6 @@ Users.init({
         allowNull: true,
         unique: true,
     },
-    refreshToken: {
-        type: sequelize_1.DataTypes.ARRAY(sequelize_1.DataTypes.STRING),
-        allowNull: true,
-    }
 }, {
     sequelize,
     tableName: 'Users',

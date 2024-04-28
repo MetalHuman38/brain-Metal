@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { logEvent } from './logEventMiddleware';
 
 export function logger(req: Request, res: Response, next: NextFunction) {
     console.log('Request URL:', req.originalUrl);

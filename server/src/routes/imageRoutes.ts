@@ -1,7 +1,6 @@
 import express from 'express';
 import { uploadMiddleware, upload as multerUpload } from '../middleware/multexMiddleware';
 import cors from 'cors';
-import { userMiddleware } from '../middleware/userMiddleware';
 
 
 
@@ -12,7 +11,7 @@ router.use(cors());
 
 const upload = multerUpload.single('image');
 
-router.post('/api/upload', upload, userMiddleware, uploadMiddleware,  (req, res) => {
+router.post('/api/upload', upload, uploadMiddleware, (req, res) => {
     try{
         res.status(201).send({ message: 'Image uploaded successfully' });
     } catch (err) {

@@ -1,38 +1,30 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useUserContext } from '@/lib/context/AuthContext';
+import useAuth from '@/lib/context/useAuth';
 
 
 const TopBar = () => {
   
-  const { user, logout, isSuccess } = useUserContext();
+  const { logout, isSuccess } = useUserContext();
+  const { user, isUserLoading } = useAuth();
+
   const navigate = useNavigate();
-  const [userData, setUserData] = useState(null);
+ 
 
   useEffect(() => {
     if (isSuccess) navigate(0);
   }, [isSuccess])
 
   useEffect(() => {
-    if (!isSuccess) {
-      // Fetch the user data from the tokenResponse in localStorage
-      const tokenResponse = JSON.parse(localStorage.getItem('tokenResponse') ?? '');
-      if (tokenResponse) {
-        try {
-          const tokenResponse = JSON.parse(localStorage.getItem('tokenResponse') ?? '');
-          const { user } = tokenResponse;
-          setUserData(user);
-        } catch (error) {
-          console.error('Error parsing access token:', error);
-          // Handle parsing error gracefully, e.g., show error message to the user
-        }
-      } else {
-        console.error('Access token not found in localStorage');
-        // Handle case where access token is not found in localStorage
+    if (!isUserLoading && !user) {
+      try {
+          navigate('/sign-in');
+      } catch (error) {
+        console.error('Error parsing access token:', error);
+        // Handle parsing error gracefully, e.g., show error message to the user
       }
-      const { user } = tokenResponse;
-      setUserData(user);
     }
   }, [isSuccess]);
 
@@ -51,8 +43,8 @@ const TopBar = () => {
           <Button variant="ghost" className="shad-button_ghost" onClick={() => logout()}>
             <img src="/assets/icons/logout.svg" alt="logout" />
           </Button>
-          <Link to={`/profile/${userData?.UserID}`} className='flex-center gap-3'>
-            <img src={userData?.AvatarUrl || '/assets/images/owner.jpg'}
+          <Link to={`/profile/${user?.UserID}`} className='flex-center gap-3'>
+            <img src={user?.AvatarUrl || '/assets/images/owner.jpg'}
               alt='profile'
             className='h-8 w-8 rounded-full'/>
           </Link>

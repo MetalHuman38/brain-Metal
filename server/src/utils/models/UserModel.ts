@@ -18,7 +18,6 @@ interface UserAttributes {
   Label: string | null;
   Last_activity: Date | undefined;  
   Updated_at: Date | undefined;
-  refreshToken?: [string] | undefined;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'UserID'> {}
@@ -27,6 +26,7 @@ interface UserCreationAttributes extends Optional<UserAttributes, 'UserID'> {}
 const sequelize = createSequelizeInstance();
 
 class Users extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  [x: string]: any;
   
   public UserID!: number;
   public MemberName!: string | null;
@@ -41,7 +41,6 @@ class Users extends Model<UserAttributes, UserCreationAttributes> implements Use
   public Label!: string | null;
   public Last_activity!: Date | undefined;
   public Updated_at: Date | undefined;
-  public refreshToken!: [string] | undefined;
 
 
   static async createUser(userData: UserCreationAttributes): Promise<Users> {
@@ -64,11 +63,6 @@ class Users extends Model<UserAttributes, UserCreationAttributes> implements Use
   // Create custom class method to detect duplicate username
   static async findUsername(Username: string): Promise<Users | null> {
     return await this.findOne({ where: { Username: Username } });
-  }
-
-  // Create custom class to find refresh token
-  static async findRefreshToken(refreshToken: string): Promise<Users | null> {
-    return await this.findOne({ where: { refreshToken: refreshToken } });
   }
 
 }
@@ -146,10 +140,6 @@ Users.init(
       allowNull: true,
       unique: true,
     },
-    refreshToken: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
-      allowNull: true,
-    }
   },
   {
     sequelize,

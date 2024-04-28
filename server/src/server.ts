@@ -4,77 +4,53 @@ import router from './routes/router';
 import http from 'http';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import { logEvent } from './middleware/logEventMiddleware';
+import authenticateRoutes from './routes/authenticateRoutes';
+import cors from 'cors';
+
+
 
 const app = express();
 
-// Cors middleware
+app.use(cors());
+
+const port = process.env.PORT || 8080;  // Default port to listen
+
 app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Origin', 'http://localhost:5173/');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Credentials', 'true')
   next();
-});
+})
 
 app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
 app.use(express.static(path.join(__dirname, '/dist')));
 app.use(cookieParser());
+app.use(express.json());
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+}
+);
+
 
 
 // Use the router for all routes
 app.use(router);
 
-// Error handler middleware
-app.use(async (req, res, next) => {
-  try {
-      const error = CreateError(404, 'API route not found');
-      throw error;
-  } catch (err) {
-      next(err);
-  }
+
+// Log all requests
+app.use((req, res, next) => {
+  logEvent(`${req.method}\t${req.headers.origin}\t${req.url}`, 'reqLog.txt');
+  next();
 });
 
-app.use(async (err: any, req: any, res: any, next: any) => {
-  try {
-    res.status(err.status || 500);
-    res.send({
-      error: {
-        status: err.status || 500,
-        message: err.message,
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-});
+app.use('/hello', (req, res) => {
+  res.status(201).send({ message: 'Hello World' });
+})
 
 
-// Start the server
-async function startServer() {
-    try {
-      await new Promise<void>((resolve, reject) => {
-        server.on('request', app);
-        server.listen(process.env.PORT || 3000, () => {
-          resolve();
-        });
-      });
-    } catch (error) {
-      console.error('Error starting server:', error);
-      process.exit(1); // Exit process with error code
-    }
-  }
-  const server = http.createServer();
+app.use(authenticateRoutes);
 
-  server.on('clientError', (err: any, socket: { destroy: () => void; }) => {
-    socket.destroy(); // Destroy the socket to prevent further events
-  });
-
-startServer();
-
-
-
-function CreateError(arg0: number, arg1: string) {
-  throw new Error('Function not implemented.');
-}
 

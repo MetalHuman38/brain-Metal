@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { VerifyErrors } from 'jsonwebtoken';
 import Users from '../utils/models/UserModel';
+
 
 declare global {
     namespace Express {
@@ -9,56 +10,47 @@ declare global {
         }
     }
 }
+const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+    const token = req.cookies.jwt;
 
-export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
-
-    const token = req.headers.authorization?.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ message: 'Access Denied - No token provided' });
-    }
-
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { UserID: number };
-        console.log('decoded', decoded);
-        const  user = await Users.findByPk(decoded.UserID);
-            if (user){
-                req.currentUser = { UserID: decoded.UserID };;
+    // Check if token exists
+    if (token) {
+        jwt.verify(token, 'metal ninja secret', (err: VerifyErrors | null, decodedToken: any) => {
+            if (err) {
+                console.error(err.message);
+                res.redirect('/login');
             } else {
-                console.error('user not found');
-                res.status(401).send({ error: 'Unauthorized' });
-                return;
+                const { UserID } = decodedToken; // Destructure UserID from decodedToken
+                req.currentUser = { UserID }; // Assign UserID to req.currentUser
+                next();
             }
-        req.body = decoded;
-        console.log('decoded reqbody', decoded);
-        next();
-    } catch (error) {
-        return res.status(401).json({ message: 'Invalid token' });
+        });
+    } else {
+        res.status(401).json({ message: 'Unauthorized' });
     }
-} 
-
-
-// export function authenticate(req: Request, res: Response, next: NextFunction) {
-
-//     const token = req.headers.authorization?.split(' ')[1];
-
-//     if (!token) {
-//         return res.status(401).json({ message: 'Access Denied - No token provided' });
-//     }
-
-//     try {
-//         const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-//         req.body = decoded;
-//         console.log('decoded', decoded);
-//         next();
-//     } catch (error) {
-//         return res.status(401).json({ message: 'Invalid token' });
-//     }
-// } 
-
-export function authorize(req: Request, res: Response, next: NextFunction) {
-    if (req.currentUser?.UserID !== req.body.UserID) {
-        return res.status(403).json({ message: 'Forbidden' });
-    }
-    next();
 }
+
+// Check current user
+const checkUser = (req: Request, res: Response, next: NextFunction): void => {
+    const token = req.cookies.jwt;
+
+    // Check if token exists
+    if (token) {
+        jwt.verify(token, 'metal ninja secret', async (err: VerifyErrors | null, decodedToken: any) => {
+            if (err) {
+                console.error(err.message);
+                res.locals.user = null;
+                next();
+            } else {
+                const user = await Users.findByPk(decodedToken.UserID);
+                res.locals.user = user;
+                next();
+            }
+        });
+    } else {
+        res.locals.user = null;
+        next();
+    }
+}
+
+export default { requireAuth, checkUser };

@@ -1,26 +1,16 @@
 import express, { Request, Response } from 'express';
 import { logger } from '../middleware/loggerMiddleware';
 import 'dotenv/config';
-import testQueryExecution from '../utils/testDatabase';
-import authRoutes from './authRoutes';
-import userRouter from './userRoutes';
 import NewPostRoutes from './NewPostRoutes';
 import postRoutes from './postRoutes';
 import likesRoutes from './likesRoutes';
 import commentRoutes from './commentRoutes';
 import imageRoutes from './imageRoutes';
-import cors from 'cors';
-
+import authenticateRoutes from './authenticateRoutes';
 
 const router = express.Router();
 
-// Enable CORS for all routes
-router.use(cors());
-
-router.use(authRoutes);
-
-// Use the user router for handling user-related routes
-router.use(userRouter);
+router.use(authenticateRoutes)
 
 // Use the NewPost router for handling post-related routes
 router.use(NewPostRoutes);
@@ -37,19 +27,13 @@ router.use(commentRoutes);
 // Use Image router for handling image-related routes
 router.use(imageRoutes);
 
-// Use the logger middleware for all routes
 router.use(logger);
 
 
-router.get('/Get-User', async (req: Request, res: Response) => {
-    try {
-        testQueryExecution();
-        res.send('Query executed successfully!');
-    } catch (error) {
-        console.error('Query Error, cant reach database:', error);
-        res.status(500).send('Error connecting to the database.');
-    }
-});
+router.post('/test', (req: Request, res: Response) => {
+    res.send('Test route success');
+}
+);
 
 
 export default router;

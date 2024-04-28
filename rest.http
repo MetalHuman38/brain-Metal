@@ -1,27 +1,6 @@
-### Health Check
-
-Send Request: GET http://localhost:3000
-
-### Message Endpoint
-http://localhost:3000/refreshToken
-
-### Message Endpoint    
-http://localhost:3000/api/getPosts?UserID=26
+http://localhost:8080/handleRegister
 
 
-### Login Endpoint
-http://localhost:3000/api/getCurrentUser
 
-
-### Login Endpoint
-
-http://localhost:3000/api/getPosts?UserID=${user.UserID}
-
-### Login Endpoint
-http://localhost:3000/api/login
-
-
-### Login Endpoint
-http://localhost:3000/api/getPosts?UserID=26
-
-
+send request
+http://localhost:8080/handleCurrentUser

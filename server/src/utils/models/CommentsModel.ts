@@ -1,6 +1,5 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { createSequelizeInstance } from './sequelizeCon';
-import Users from './UserModel';
 
 interface CommentAttributes {
   CommentID: number;

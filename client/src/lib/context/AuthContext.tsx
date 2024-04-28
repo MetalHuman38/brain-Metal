@@ -10,9 +10,7 @@ import instance from "../axiosConfig";
 type AuthContextType = {
   user: IUser | null;
   posts: INewPost[];
-  login: (values: { email: string; password: string }) => Promise<void>;
   logout: () => void;
-  register: (values: { name: string; username: string; email: string; password: string }) => Promise<void>;
   handleUpload: (file: File) => Promise<void>;
   createPost: (values: { Caption: string; ImageURL: string; Tags: string; Location: string }) => Promise<INewPost | null>;
   updateUser: (values: IUpdateUser) => Promise<void>;
@@ -30,9 +28,7 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   posts: [],
-  login: async () => {},
   logout: () => {},
-  register: async () => {},
   createPost: async () => null,
   handleUpload: async () => {},
   updateUser: async () => {},
@@ -67,27 +63,9 @@ useEffect(() => {
     instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
   }
 }, []);
+
+
   
-
-  async function login(values: { email: string; password: string }) {
-    try {
-      const response = await instance.post("/login", values, {
-      });
-      if (response.data.error) {
-        console.error('Error logging in user:', response.data.error);
-        return;
-      }
-      const { user, token } = response.data;
-      localStorage.setItem("tokenResponse", JSON.stringify(response.data));  
-      setUser(user);
-      localStorage.setItem("accessToken", token);
-      instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      navigate("/");
-    } catch (error) {
-    console.error('Error logging in user:', error);
-  }
-}
-
   async function createPost(values: { Caption: string; ImageURL: string; Tags: string; Location: string }) {
     try {
       const response = await instance.post("/createPost", values);
@@ -103,14 +81,15 @@ useEffect(() => {
   // Implement useEffect to get recent posts
 useEffect(() => {
   const fetchPosts = async () => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("refreshToken");
     if (accessToken) {
       setisPostLoading(true);
       try {
-        const newPosts = await instance.get("/getPosts");
+        const newPosts = await instance.get("/getPosts", {
         headers: {
-          Authorization: `Bearer ${accessToken}`;
+          Authorization: `Bearer ${accessToken}`,
         }
+      });
         setPosts(newPosts.data);
       } catch (error) {
         console.error('Error getting posts:', error);
@@ -169,14 +148,12 @@ useEffect(() => {
   
   async function logout() {
     setUser(null);
-    localStorage.removeItem("token");
+    localStorage.removeItem("jwt");
     delete instance.defaults.headers.common["Authorization"];
     navigate("/sign-in");
   }
 
-  async function register(values: { name: string; username: string; email: string; password: string }) {
-    await instance.post("/register", values);
-  }
+ 
 
   async function updateUser(values: IUpdateUser) {
     const response = await instance.put(`/users/${values.userId}`, values);
@@ -192,10 +169,8 @@ useEffect(() => {
   return (
     <AuthContext.Provider value={{ 
       user,
-      posts,
-      login, 
+      posts, 
       logout, 
-      register, 
       createPost,
       handleUpload,
       updateUser,

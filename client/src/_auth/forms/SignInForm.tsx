@@ -6,14 +6,21 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
 import { SignInValidation } from "@/lib/validation";
-import { z } from "zod";
 import Loader from "@/components/shared/Loader";
 import { useUserContext } from "@/lib/context/AuthContext";
+import { z } from "zod";
+import instance from "@/lib/axiosConfig";
+import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+
 
 
 const SignInForm = () => {
 
-  const { login, isUserLoading } = useUserContext();
+  const { isUserLoading } = useUserContext();
+
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof SignInValidation>>({
@@ -26,11 +33,22 @@ const SignInForm = () => {
 
   // 2. Define a submit handler.
   async function onSubmit(values: z.infer<typeof SignInValidation>) {
-      try{
-      await login(values);
+    try {
+      const user = await instance.post("/handleLoginAuth", values);
+      if (!user) {
+        return toast({
+          title: "Sign in failed. Please try again.",
+        });
+      } else {
+        toast({
+          title: "Sign in successful! .",
+        });
+        navigate("/")
+      }
+      form.reset();
     } catch (error) {
       console.error('Error logging in user:', error);
-      }
+    }
   } 
     return (
       <Form {...form}>
