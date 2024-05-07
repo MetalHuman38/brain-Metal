@@ -32,7 +32,8 @@ const uploadMiddleware = async (req, res) => {
             const query = `INSERT INTO ImageStorage (ImageURL) VALUES ('${imageUrl}')`;
             // Execute the raw query using the Sequelize instance
             await sequelize.query(query);
-            const user = await UserModel_1.default.findOne({ where: { UserID: req.currentUser?.UserID } });
+            const userId = req.body; // Convert userId to a number
+            const user = await UserModel_1.default.findOne(userId);
             if (!user) {
                 console.error('User not found');
                 res.status(404).send({ error: 'User not found' });

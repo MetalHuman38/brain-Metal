@@ -39,7 +39,7 @@ const LeftSideBar = () => {
           <p>Loading user data...</p>
         ) : (
           <Link to={`/profile/${user?.UserID}`}>
-            <img src={user?.AvatarUrl || '/assets/images/owner.jpg'} alt='profile' className='h-14 w-14 rounded-full' />
+            <img src={user?.ImageUrl || '/assets/images/owner.jpg'} alt='profile' className='h-14 w-14 rounded-full' />
             <div className='flex flex-col'>
               <p className='body-bold'>{user?.FirstName}</p>
               <p>@{user?.Username}</p>

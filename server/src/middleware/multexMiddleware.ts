@@ -37,8 +37,9 @@ const uploadMiddleware = async (req: Request, res: Response) => {
       // Execute the raw query using the Sequelize instance
       await sequelize.query(query);
 
+      const userId = req.body; // Convert userId to a number
       
-      const user = await Users.findOne({ where: { UserID: req.currentUser?.UserID } });
+      const user = await Users.findOne(userId);
 
       if (!user) {
         console.error('User not found');
