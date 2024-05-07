@@ -61,5 +61,6 @@ Posts.init({
     createdAt: 'CreatedAt',
     timestamps: false
 });
+// Create hook to fetch PostBy primaryKey
 exports.default = Posts;
 //# sourceMappingURL=PostModels.js.map

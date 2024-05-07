@@ -1,9 +1,14 @@
 import { NextFunction, Request, Response } from 'express';
 import UserRegistrations from '../utils/models/UserRegistrationModel';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 import Users from '../utils/models/UserModel';
-import jwt, { VerifyErrors } from 'jsonwebtoken';
+import { VerifyErrors } from 'jsonwebtoken';
 
 
+dotenv.config();
+
+// Extend the Express Request type to include a currentUser property
 declare global {
     namespace Express {
         interface Request {
@@ -11,6 +16,7 @@ declare global {
         }
     }
 }
+
 
 function hasErrors(err: any): err is  { errors: any }{
     return err && typeof err.errors === 'object';
@@ -59,8 +65,13 @@ export const handleError = (err: Error & { code?: number }, res: Response): void
 
 // Create Token
 const maxAge = 3 * 24 * 60 * 60;
-const createToken = (UserID: number) => {
-    return jwt.sign({UserID}, 'metal ninja secret', { expiresIn: maxAge})
+// const createToken = (UserID: number) => {
+//     return jwt.sign({UserID}, 'metal ninja secret', as string, { expiresIn: maxAge})
+// }
+
+export function generateToken(UserID: number): string {
+    const token = jwt.sign({ UserID }, 'metal ninja secret' as string , { expiresIn: maxAge });
+    return token;
 }
 
 
@@ -78,19 +89,19 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
             HashedPassword: password,
             
         });
-        const token = createToken(user.UserID);
+        const token = generateToken(user.UserID);
         res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000})
         res.status(201).json({ user: user.UserID })
 
     } catch (error: any) {
         handleError(error, res);
         console.log('Error creating new user:', error)
-        res.status(500).json({ message: 'cannot create a new user' });
     }
 };
 
 
 export const handleLogin = async (req: Request, res: Response): Promise<void> => {
+
     const { email, password } = req.body;
 
     try {
@@ -98,34 +109,43 @@ export const handleLogin = async (req: Request, res: Response): Promise<void> =>
         if (!user) {
             throw new Error('incorrect email');
         }
-        const token = createToken(user.UserID);
-        res.cookie('jwt', token, { httpOnly: true, maxAge: maxAge * 1000})
-        res.status(200).json({ user: user.UserID });
+        const token = generateToken(user.UserID);
+        const maxAge = 3 * 24 * 60 * 60; // 3 days in seconds
+        const expires = new Date(Date.now() + maxAge * 1000);
+        // Set cookies to local storage in browser
+        res.cookie('jwt', token, { httpOnly: true, secure: true, sameSite: true, maxAge: maxAge * 1000, expires });
+        // set headers for the user
+        res.setHeader('Authorization', `Bearer ${token}`);
+        // add cookie to local storage
+        res.locals.user = user;
+        res.status(200).json({ token, user: user.UserID});
     } catch (error: any) {
         handleError(error, res);
     }
 }
 
-
-// Function to get the current user
-export const handleCurrentUser = async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { user } = req.body;
-        if (!user) {
-            res.status(404).json({ message: 'User not found' });
-            return;
-        }
-        const currentUser = await UserRegistrations.findUserByEmail(user.UserID);
-        if (!currentUser) {
-            res.status(404).json({ message: 'User not found' });
-            return;
-        }
-        res.status(200).json({ user: currentUser });
-    } catch (error) {
-        console.error('Error getting user:', error);
-        res.status(500).json({ message: 'Error getting user' });
+// function to get current user
+export const getCurrentUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const token = req.body || req.cookies.jwt;
+    if (token) {
+        jwt.verify(token, 'metal ninja secret' as string, async (err: VerifyErrors | null, decodedToken: any) => {
+            console.log('decoded token:', decodedToken);
+            if (err) {
+                console.error(err.message);
+                res.locals.user = null;
+            } else {
+                const user = await Users.findByPk(decodedToken.UserID);
+                res.locals.user = user;
+            }
+        });
+    } else {
+        res.locals.user = null;
+        res.status(200).json({ token, user: token.UserID});
+        next();
     }
 }
+
+
 
 // function to logout user
 export const logoutUser = (req: Request, res: Response): void => {
@@ -135,4 +155,4 @@ export const logoutUser = (req: Request, res: Response): void => {
 };
 
 
-export default { registerUser, handleLogin, handleCurrentUser, logoutUser};
+export default { registerUser, handleLogin, getCurrentUser, logoutUser};

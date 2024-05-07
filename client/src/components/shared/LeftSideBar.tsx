@@ -1,27 +1,28 @@
 import { sidebarLinks } from '@/constants';
 import { useUserContext } from '@/lib/context/AuthContext';
 import { INavLink } from '@/types';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import useAuth from '@/lib/context/useAuth';
 
 const LeftSideBar = () => {
   const { logout } = useUserContext();
-  const { user, isUserLoading } = useAuth();
+  const { user } = useAuth();
+  const [isUserLoading, setIsUserLoading] = useState(true);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!isUserLoading && !user) {
-
       try {
+        setIsUserLoading(false);
         navigate('/');
       } catch (error) {
         console.error('Error parsing access token:', error);
       }
     }
-  }, [isUserLoading]);
+  }, [isUserLoading, user]);
 
   return (
     <nav className='leftsidebar'>
@@ -34,13 +35,13 @@ const LeftSideBar = () => {
             height={36}
           />
         </Link>
-        {isUserLoading || !user ? (
+        {!user || !isUserLoading ? (
           <p>Loading user data...</p>
         ) : (
           <Link to={`/profile/${user?.UserID}`}>
             <img src={user?.AvatarUrl || '/assets/images/owner.jpg'} alt='profile' className='h-14 w-14 rounded-full' />
             <div className='flex flex-col'>
-              <p className='body-bold'>{user?.MemberName}</p>
+              <p className='body-bold'>{user?.FirstName}</p>
               <p>@{user?.Username}</p>
             </div>
           </Link>

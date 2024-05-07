@@ -2,11 +2,13 @@ import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { createSequelizeInstance } from './sequelizeCon';
 import Posts from './PostModels';
 import Comment from './CommentsModel';
+import UserRegistrations from './UserRegistrationModel';
 
 
 interface UserAttributes {
   UserID: number;
-  MemberName: string | null;
+  FirstName: string | null;
+  LastName: string | null;
   Username: string;
   Email: string;
   HashedPassword: string;
@@ -26,10 +28,9 @@ interface UserCreationAttributes extends Optional<UserAttributes, 'UserID'> {}
 const sequelize = createSequelizeInstance();
 
 class Users extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-  [x: string]: any;
-  
   public UserID!: number;
-  public MemberName!: string | null;
+  public FirstName!: string | null;
+  public LastName!: string | null;
   public Username!: string;
   public Email!: string;    
   public HashedPassword!: string;
@@ -51,10 +52,6 @@ class Users extends Model<UserAttributes, UserCreationAttributes> implements Use
     return await this.findOne({ where: { Email: email } });
   }
 
-  static async findByUserId(UserID: string): Promise<Users | null> {
-    return await this.findByPk(UserID);
-  }
-
   // Create custom class method to find Image URL
   static async findImageURL(ImageURL: string): Promise<Users | null> {
     return await this.findOne({ where: { ImageURL: ImageURL } });
@@ -65,7 +62,32 @@ class Users extends Model<UserAttributes, UserCreationAttributes> implements Use
     return await this.findOne({ where: { Username: Username } });
   }
 
+  // Static method to provide userRegistration attributes
+  static async findUserRegistration(UserID: number): Promise<UserRegistrations | null> {
+    return await UserRegistrations.findByPk(UserID);
+  }
+
+  // Static method to find user by primary key
+  static async findUser(UserID: number): Promise<Users | null> {
+    return await Users.findOne({ where: { UserID: UserID } });
+  }
+
+  // Static method to find user by primary key
+  static async findByPk(UserID: number): Promise<Users | null> {
+    return await Users.findOne({ where: { UserID: UserID } });
+  }
+
+  static async currentUser(UserID: number): Promise<Users | null> {
+    try{
+      return await Users.findOne({ where: { UserID: UserID } });
+    }
+    catch(error){
+      console.error('Error fetching user by ID:', error);
+      throw error;
+    }
+  }
 }
+
 
 // Define the User model
 Users.init(
@@ -76,9 +98,14 @@ Users.init(
       autoIncrement: true,
       allowNull: false
     },
-    MemberName: {
+    FirstName: {
+      type: DataTypes.STRING, 
+      allowNull: false,
+      unique: true,
+    },
+    LastName: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
       unique: true,
     },
 
@@ -151,8 +178,30 @@ Users.init(
   }
 );
 
-// Define associations
-Users.hasMany(Posts, { foreignKey: 'PostID', as: 'post' });
+
+  
+
+
+Users.afterCreate(async (user, options) => {
+  try {
+    console.log('User created:', user);
+  } catch (error) {
+    console.error('Error creating user:', error);
+  }
+});
+
+Users.currentUser = async function (UserID: number) {
+  try {
+    const user = await Users.findOne({ where: { UserID } });
+    console.log('User:', user); // Log the user object
+    return user; // Return the user object if found
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    throw error; // Rethrow the error to handle it in the calling code
+  }
+}
+
+
 Users.hasMany(Comment, { foreignKey:  'UserID', as: 'comments'});
 Posts.belongsTo(Users, { foreignKey:  'PostID', as: 'creator'});
 

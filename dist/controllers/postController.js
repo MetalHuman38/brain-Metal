@@ -5,8 +5,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deletePostById = exports.updatePostById = exports.getPostById = exports.getRecentPosts = void 0;
 const PostModels_1 = __importDefault(require("../utils/models/PostModels"));
-const dbConfig_1 = require("../utils/dbConfig");
-const sequelize_1 = require("sequelize");
 // Get Recent Posts
 const getRecentPosts = async (req, res) => {
     try {
@@ -22,35 +20,8 @@ exports.getRecentPosts = getRecentPosts;
 // Get post by ID
 const getPostById = async (req, res) => {
     try {
-        const PostID = req.params.PostID;
-        const UserID = req.params.UserID;
-        if (!UserID) {
-            res.status(401).json({ message: 'Unauthorized' });
-            return;
-        }
-        if (!PostID) {
-            res.status(400).json({ message: 'PostID is required' });
-            return;
-        }
-        if (!req.params.UserID) {
-            res.status(400).json({ message: 'UserID is required' });
-            return;
-        }
-        if (!req.params.PostID) {
-            res.status(400).json({ message: 'PostID is required' });
-            return;
-        }
-        // Get the Sequelize instance
-        const sequelize = await (0, dbConfig_1.waitForDB)();
-        const post = await sequelize.query('SELECT * FROM Posts WHERE PostID = :PostID AND UserID = :UserID', {
-            replacements: { PostID, UserID },
-            type: sequelize_1.QueryTypes.SELECT,
-        });
-        if (!post.length) {
-            res.status(404).json({ message: 'Post not found' });
-            return;
-        }
-        res.status(200).send(post[0]);
+        const post = await PostModels_1.default.findByPk();
+        res.status(200).json(post);
     }
     catch (error) {
         console.error('Error fetching post by ID:', error);

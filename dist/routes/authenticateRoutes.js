@@ -29,12 +29,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const authenticateCon = __importStar(require("../controllers/authenticateCon"));
 const cors_1 = __importDefault(require("cors"));
-const authMiddleware_js_1 = __importDefault(require("../middleware/authMiddleware.js"));
 const router = express_1.default.Router();
 router.use((0, cors_1.default)());
+router.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 router.post('/handleRegister', authenticateCon.registerUser);
 router.post('/handleLoginAuth', authenticateCon.handleLogin);
-router.get('/handleCurrentUser', authMiddleware_js_1.default.checkUser, authenticateCon.handleCurrentUser);
+router.get('/getCurrentUser', authenticateCon.getCurrentUser);
 router.get('/handleLogout', authenticateCon.logoutUser);
 exports.default = router;
 //# sourceMappingURL=authenticateRoutes.js.map

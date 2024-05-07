@@ -96,5 +96,9 @@ Posts.init(
 }
 );
 
+// Create hook to fetch PostBy primaryKey
+
+
+
 
 export default Posts;

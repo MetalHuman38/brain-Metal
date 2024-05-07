@@ -8,6 +8,7 @@ require("dotenv/config");
 const sequelizeCon_1 = require("./sequelizeCon");
 const UserModel_1 = __importDefault(require("./UserModel"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const avatarUtils_1 = require("../avatarUtils");
 // Define Instance of Sequelize
 const sequelize = (0, sequelizeCon_1.createSequelizeInstance)();
 class UserRegistrations extends sequelize_1.Model {
@@ -23,13 +24,17 @@ class UserRegistrations extends sequelize_1.Model {
     static async loginUser(username, password) {
         return await this.findOne({ where: { Username: username, HashedPassword: password } });
     }
+    // Create a static method to find a user by primaryKey
+    static async findUserByPk(UserID) {
+        return await this.findByPk(UserID);
+    }
     // Create a static method to find a user by email
     static async findUserByEmail(email) {
         return await this.findOne({ where: { Email: email } });
     }
-    // Create a static method to find a user by ID
-    static async findUserById(id) {
-        return await this.findByPk(id);
+    // Create a static method to find logged in user by user id sent to payload
+    static async findUserById(UserID) {
+        return await this.findByPk(UserID);
     }
 }
 // Define the User model
@@ -45,7 +50,7 @@ UserRegistrations.init({
         allowNull: true,
         validate: {
             len: [3, 50],
-            notEmpty: true,
+            notEmpty: false,
         }
     },
     Username: {
@@ -100,6 +105,39 @@ UserRegistrations.beforeCreate(async (user) => {
         // If an error occurs during the pre-processing, you can choose to handle it or throw it
     }
 });
+UserRegistrations.afterCreate(async (user) => {
+    try {
+        if (user) {
+            // Find the index of the last space in the NewUser field
+            const spaceIndex = user.NewUser?.lastIndexOf(' ');
+            // Extract the first name and last name based on the last space
+            const firstName = spaceIndex !== -1 ? user.NewUser?.slice(0, spaceIndex) : user.NewUser;
+            const lastName = spaceIndex !== -1 ? user.NewUser?.slice(spaceIndex ?? +1) : null;
+            const avatar = (0, avatarUtils_1.generateAvatarUrl)(user.Username);
+            // Create or update the user record in the Users table
+            await UserModel_1.default.upsert({
+                UserID: user.UserID,
+                FirstName: firstName,
+                LastName: lastName,
+                Username: user.Username,
+                Email: user.Email,
+                HashedPassword: user.HashedPassword,
+                Status: null,
+                Bio: 'I am a new',
+                Join: new Date(),
+                AvatarUrl: avatar,
+                ImageURL: avatar,
+                Label: 'New User',
+                Last_activity: new Date(),
+                Updated_at: new Date(),
+            });
+        }
+    }
+    catch (error) {
+        console.error('Error after creating user:', error);
+        throw new Error('Error after creating user');
+    }
+});
 // Define a custom class method to log in a user
 UserRegistrations.loginUser = async function (email, password) {
     try {
@@ -122,18 +160,26 @@ UserRegistrations.loginUser = async function (email, password) {
         throw new Error('User not found');
     }
 };
-// Define a custom class method to log in a user
+// Create a user with the returned user from login method
 UserRegistrations.findUserByEmail = async function (email) {
     try {
         return await this.findOne({ where: { Email: email } });
     }
     catch (error) {
-        console.error('Error finding user by email:', error);
-        throw new Error('Error finding user by email');
+        console.error('Error fetching user by email:', error);
+        throw error;
     }
 };
-UserRegistrations.hasOne(UserModel_1.default, { foreignKey: 'UserID', as: 'user' });
-UserModel_1.default.belongsTo(UserRegistrations, { foreignKey: 'UserID', as: 'registration' });
+UserRegistrations.findUserByPk = async function (UserID) {
+    try {
+        return await this.findByPk(UserID);
+    }
+    catch (error) {
+        console.error('Error fetching user by ID:', error);
+        throw error;
+    }
+};
+// Sync the User model with the database
 sequelize.sync()
     .then(() => {
     console.log('New registration synced successfully');

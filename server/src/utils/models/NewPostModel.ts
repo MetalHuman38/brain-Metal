@@ -1,6 +1,7 @@
 import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import { createSequelizeInstance } from './sequelizeCon';
 import Users from './UserModel';
+import Posts from './PostModels';
 
 interface NewPostAttributes {
   NewPostID: number;
@@ -90,6 +91,18 @@ NewPosts.init(
     timestamps: false
 }
 );
+
+// Create a new hook to save NewPost details to Post Table useing Post attribute
+NewPosts.afterCreate(async (newPost, options) => {
+  await Posts.create({
+    PostID: newPost.NewPostID,
+    Caption: newPost.Caption,
+    ImageURL: newPost.ImageURL,
+    Location: newPost.Location,
+    Tags: newPost.Tags,
+    CreatedAt: newPost.CreatedAt,
+  });
+});
 
 // Create foreign key relationship
 NewPosts.belongsTo(Users, {foreignKey: 'NewPostID', 

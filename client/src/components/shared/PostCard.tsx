@@ -1,4 +1,4 @@
-import { useUserContext } from "@/lib/context/AuthContext";
+import useAuth from "@/lib/context/useAuth";
 import { timeAgo } from "@/lib/utils";
 import { IUpdatePost } from "@/types";
 import { Link } from "react-router-dom"
@@ -9,13 +9,13 @@ type PostCardProps = {
 
 const PostCard = ({ post }: PostCardProps) => {
 
-  const { user } = useUserContext(); // Assuming you have access to the user context
+  const { user } = useAuth(); // Assuming you have access to the user context
  
   return (
     <div className="post-card">
        <div className="flex-between">
         <div className="flex items-center gap-3">
-          <Link to={`/profile/${user?.UserID}`}>
+          <Link to={`/profile/${user?.ImageUrl}`}>
           <img src={user?.ImageUrl || '/assets/icons/profile-placeholder.svg'} 
                alt="User" 
                className="rounded-full w-12 lg:h-12" />
@@ -26,7 +26,7 @@ const PostCard = ({ post }: PostCardProps) => {
             </p>
             <div className="flex-center gap-2 text-light-3">
               <p className="subtle-semibold lg:small-regular">
-                {timeAgo(post?.CreatedAt.toString())}
+                {post?.CreatedAt && timeAgo(post.CreatedAt.toString())}
               </p>
               - 
               <p className="sublte-semibold lg:small-regular">

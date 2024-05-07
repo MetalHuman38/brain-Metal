@@ -7,6 +7,7 @@ const sequelize_1 = require("sequelize");
 const sequelizeCon_1 = require("./sequelizeCon");
 const PostModels_1 = __importDefault(require("./PostModels"));
 const CommentsModel_1 = __importDefault(require("./CommentsModel"));
+const UserRegistrationModel_1 = __importDefault(require("./UserRegistrationModel"));
 // Define Instance of Sequelize
 const sequelize = (0, sequelizeCon_1.createSequelizeInstance)();
 class Users extends sequelize_1.Model {
@@ -16,9 +17,6 @@ class Users extends sequelize_1.Model {
     static async findByEmail(email) {
         return await this.findOne({ where: { Email: email } });
     }
-    static async findByUserId(UserID) {
-        return await this.findByPk(UserID);
-    }
     // Create custom class method to find Image URL
     static async findImageURL(ImageURL) {
         return await this.findOne({ where: { ImageURL: ImageURL } });
@@ -26,6 +24,27 @@ class Users extends sequelize_1.Model {
     // Create custom class method to detect duplicate username
     static async findUsername(Username) {
         return await this.findOne({ where: { Username: Username } });
+    }
+    // Static method to provide userRegistration attributes
+    static async findUserRegistration(UserID) {
+        return await UserRegistrationModel_1.default.findByPk(UserID);
+    }
+    // Static method to find user by primary key
+    static async findUser(UserID) {
+        return await Users.findOne({ where: { UserID: UserID } });
+    }
+    // Static method to find user by primary key
+    static async findByPk(UserID) {
+        return await Users.findOne({ where: { UserID: UserID } });
+    }
+    static async currentUser(UserID) {
+        try {
+            return await Users.findOne({ where: { UserID: UserID } });
+        }
+        catch (error) {
+            console.error('Error fetching user by ID:', error);
+            throw error;
+        }
     }
 }
 // Define the User model
@@ -36,9 +55,14 @@ Users.init({
         autoIncrement: true,
         allowNull: false
     },
-    MemberName: {
+    FirstName: {
         type: sequelize_1.DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
+        unique: true,
+    },
+    LastName: {
+        type: sequelize_1.DataTypes.STRING,
+        allowNull: false,
         unique: true,
     },
     Username: {
@@ -102,8 +126,25 @@ Users.init({
     createdAt: 'Join',
     timestamps: false
 });
-// Define associations
-Users.hasMany(PostModels_1.default, { foreignKey: 'PostID', as: 'post' });
+Users.afterCreate(async (user, options) => {
+    try {
+        console.log('User created:', user);
+    }
+    catch (error) {
+        console.error('Error creating user:', error);
+    }
+});
+Users.currentUser = async function (UserID) {
+    try {
+        const user = await Users.findOne({ where: { UserID } });
+        console.log('User:', user); // Log the user object
+        return user; // Return the user object if found
+    }
+    catch (error) {
+        console.error('Error fetching user by ID:', error);
+        throw error; // Rethrow the error to handle it in the calling code
+    }
+};
 Users.hasMany(CommentsModel_1.default, { foreignKey: 'UserID', as: 'comments' });
 PostModels_1.default.belongsTo(Users, { foreignKey: 'PostID', as: 'creator' });
 exports.default = Users;

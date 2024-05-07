@@ -1,6 +1,11 @@
-http://localhost:8080/handleRegister
+GET http://localhost:8080/getCurrentUser
 
 
 
-send request
-http://localhost:8080/handleCurrentUser
+
+        
+
+
+
+
+

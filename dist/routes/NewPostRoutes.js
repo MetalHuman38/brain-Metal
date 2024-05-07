@@ -10,6 +10,6 @@ const router = express_1.default.Router();
 // Enable CORS for all routes
 router.use((0, cors_1.default)());
 // Create a new post
-router.post('/api/createPost', NewPostController_1.createPost);
+router.post('/createPost', NewPostController_1.createPost);
 exports.default = router;
 //# sourceMappingURL=NewPostRoutes.js.map

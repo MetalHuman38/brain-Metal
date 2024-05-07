@@ -9,6 +9,6 @@ const router = express.Router();
 router.use(cors());
 
 // Create a new post
-router.post('/api/createPost', createPost);
+router.post('/createPost', createPost);
 
 export default router;

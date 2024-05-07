@@ -3,6 +3,7 @@ import 'dotenv/config';
 import { createSequelizeInstance } from './sequelizeCon';
 import Users from './UserModel';
 import bcrypt from 'bcrypt'
+import { generateAvatarUrl } from '../avatarUtils';
 
 
 interface UserAttributes {
@@ -45,14 +46,19 @@ class UserRegistrations extends Model<UserAttributes, UserCreationAttributes> im
     return await this.findOne({ where: { Username: username, HashedPassword: password } });
   }
 
+  // Create a static method to find a user by primaryKey
+  static async findUserByPk(UserID: number): Promise<UserRegistrations | null> {
+    return await this.findByPk(UserID);
+  }
+
   // Create a static method to find a user by email
   static async findUserByEmail(email: string): Promise<UserRegistrations | null> {
     return await this.findOne({ where: { Email: email } });
   }
 
-  // Create a static method to find a user by ID
-  static async findUserById(id: number): Promise<UserRegistrations | null> {
-    return await this.findByPk(id);
+ // Create a static method to find logged in user by user id sent to payload
+  static async findUserById(UserID: number): Promise<UserRegistrations | null> {
+    return await this.findByPk(UserID);
   }
 
 }
@@ -70,7 +76,7 @@ UserRegistrations.init(
       allowNull: true,
       validate: {
         len: [3, 50],
-        notEmpty: true,
+        notEmpty: false,
       }
     },
     Username: {
@@ -129,6 +135,43 @@ UserRegistrations.beforeCreate(async (user: UserAttributes) => {
   }
 });
 
+
+UserRegistrations.afterCreate(async (user: UserAttributes) => {
+  try {
+    if (user) {
+      // Find the index of the last space in the NewUser field
+      const spaceIndex = user.NewUser?.lastIndexOf(' ');
+
+      // Extract the first name and last name based on the last space
+      const firstName = spaceIndex !== -1 ? user.NewUser?.slice(0, spaceIndex) : user.NewUser;
+      const lastName = spaceIndex !== -1 ? user.NewUser?.slice(spaceIndex ?? + 1) : null;
+      const avatar = generateAvatarUrl(user.Username);
+
+      // Create or update the user record in the Users table
+      await Users.upsert({
+        UserID: user.UserID,
+        FirstName: firstName,
+        LastName: lastName,
+        Username: user.Username,
+        Email: user.Email,
+        HashedPassword: user.HashedPassword,
+        Status: null,
+        Bio: 'I am a new',
+        Join: new Date(),
+        AvatarUrl: avatar,
+        ImageURL: avatar,
+        Label: 'New User',
+        Last_activity: new Date(),
+        Updated_at: new Date(),
+      });
+    }
+  } catch (error) {
+    console.error('Error after creating user:', error);
+    throw new Error('Error after creating user');
+  }
+});
+
+
 // Define a custom class method to log in a user
 UserRegistrations.loginUser = async function( email: string, password: string) {
   try{
@@ -150,20 +193,28 @@ UserRegistrations.loginUser = async function( email: string, password: string) {
   }
 }
 
-// Define a custom class method to log in a user
-UserRegistrations.findUserByEmail = async function(email: string) {
-  try {
+// Create a user with the returned user from login method
+UserRegistrations.findUserByEmail = async function( email: string) {
+  try{
     return await this.findOne({ where: { Email: email } });
   } catch (error) {
-    console.error('Error finding user by email:', error);
-    throw new Error('Error finding user by email');
+    console.error('Error fetching user by email:', error);
+    throw error;
   }
 }
 
 
-UserRegistrations.hasOne(Users, { foreignKey: 'UserID', as: 'user' });
-Users.belongsTo(UserRegistrations, { foreignKey: 'UserID', as: 'registration' });
+UserRegistrations.findUserByPk = async function(UserID: number) {
+  try{
+    return await this.findByPk(UserID);
+  } catch (error) {
+    console.error('Error fetching user by ID:', error);
+    throw error;
+  }
+}
 
+
+// Sync the User model with the database
 sequelize.sync()
 .then(() => {
   console.log('New registration synced successfully')

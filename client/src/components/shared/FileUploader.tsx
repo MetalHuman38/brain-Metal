@@ -31,12 +31,13 @@ const FileUpLoader = ({fieldChange, mediaUrl}: FileUpLoaderProps) => {
   
   // Implement HandleUpload from AuthContext.tsx to upload images and access logged in user token
   async function handleUpload(file: File) {
+    const storedToken = localStorage.getItem('user');
     const formData = new FormData();
     formData.append('image', file);
     try {
       const response = await instance.post('/upload', formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${storedToken}`,
         },
       });
       console.log('Upload successful', response.data);

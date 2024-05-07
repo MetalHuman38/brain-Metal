@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const sequelize_1 = require("sequelize");
 const sequelizeCon_1 = require("./sequelizeCon");
 const UserModel_1 = __importDefault(require("./UserModel"));
+const PostModels_1 = __importDefault(require("./PostModels"));
 // Define Instance of Sequelize
 const sequelize = (0, sequelizeCon_1.createSequelizeInstance)();
 class NewPosts extends sequelize_1.Model {
@@ -61,6 +62,17 @@ NewPosts.init({
     tableName: 'NewPosts',
     createdAt: 'CreatedAt',
     timestamps: false
+});
+// Create a new hook to save NewPost details to Post Table useing Post attribute
+NewPosts.afterCreate(async (newPost, options) => {
+    await PostModels_1.default.create({
+        PostID: newPost.NewPostID,
+        Caption: newPost.Caption,
+        ImageURL: newPost.ImageURL,
+        Location: newPost.Location,
+        Tags: newPost.Tags,
+        CreatedAt: newPost.CreatedAt,
+    });
 });
 // Create foreign key relationship
 NewPosts.belongsTo(UserModel_1.default, { foreignKey: 'NewPostID',

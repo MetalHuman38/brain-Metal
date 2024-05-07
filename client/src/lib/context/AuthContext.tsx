@@ -56,16 +56,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const navigate = useNavigate();
 
 
-
-useEffect(() => {
-  const accessToken = localStorage.getItem("refreshToken");
-  if (accessToken) {
-    instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
-  }
-}, []);
-
-
-  
   async function createPost(values: { Caption: string; ImageURL: string; Tags: string; Location: string }) {
     try {
       const response = await instance.post("/createPost", values);
@@ -78,40 +68,21 @@ useEffect(() => {
     }
   }
 
-  // Implement useEffect to get recent posts
-useEffect(() => {
-  const fetchPosts = async () => {
-    const accessToken = localStorage.getItem("refreshToken");
-    if (accessToken) {
-      setisPostLoading(true);
-      try {
-        const newPosts = await instance.get("/getPosts", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        }
-      });
-        setPosts(newPosts.data);
-      } catch (error) {
-        console.error('Error getting posts:', error);
-        setPosts([]);
-        localStorage.removeItem("accessToken");
-      } finally {
-        setisPostLoading(false);
-      }
-    }
-  };
-  fetchPosts(); 
-}, []);
 
   // Implement HandleUpload function to upload images and access logged in user token
   async function handleUpload(file: File) {
     setisImageUploading(true);
     const formData = new FormData();
     formData.append('image', file);
+    const token = localStorage.getItem("user");
+    if (!token) {
+      return;
+    }
     try {
+      setisImageUploading(true);
       const response = await instance.post('/upload', formData, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          Authorization: `Bearer ${localStorage.getItem("user")}`,
         },
       });
       console.log('Upload successful', response.data);
@@ -121,13 +92,16 @@ useEffect(() => {
     }
   }
 
+
    useEffect(() => {
-    const token = localStorage.getItem("token");
-    if(token) {
+    const storedToken = localStorage.getItem('token')
+    if(storedToken) {
       setisPostLoading(true);
       instance.get("/getRecentPosts", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          Authorization: `Bearer ${storedToken}`,
         },
       })
         .then((response) => {
@@ -137,7 +111,6 @@ useEffect(() => {
         .catch((error) => {
           console.error('Error getting posts:', error);
           setPosts([]);
-          localStorage.removeItem("accessToken");
         })
         .finally(() => {
           setisPostLoading(false);

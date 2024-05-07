@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { VerifyErrors } from 'jsonwebtoken';
-import Users from '../utils/models/UserModel';
+import dotenv from 'dotenv';
+import UserRegistrations from '../utils/models/UserRegistrationModel';
 
+dotenv.config();
 
 declare global {
     namespace Express {
@@ -10,9 +12,11 @@ declare global {
         }
     }
 }
-const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
-    const token = req.cookies.jwt;
 
+// Require authentication
+const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
+
+    const token = req.cookies.jwt;
     // Check if token exists
     if (token) {
         jwt.verify(token, 'metal ninja secret', (err: VerifyErrors | null, decodedToken: any) => {
@@ -31,26 +35,37 @@ const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
 }
 
 // Check current user
-const checkUser = (req: Request, res: Response, next: NextFunction): void => {
+const checkUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
     const token = req.cookies.jwt;
 
     // Check if token exists
     if (token) {
-        jwt.verify(token, 'metal ninja secret', async (err: VerifyErrors | null, decodedToken: any) => {
+        jwt.verify(token, process.env.JWT_SECRET as string, async (err: VerifyErrors | null, decodedToken: any) => {
             if (err) {
                 console.error(err.message);
                 res.locals.user = null;
                 next();
             } else {
-                const user = await Users.findByPk(decodedToken.UserID);
-                res.locals.user = user;
-                next();
+                try {
+                    // Fetch the user object from the database based on the decoded user ID
+                    const user = await UserRegistrations.findByPk(decodedToken.UserID);
+                    // Set the user object to res.locals.user
+                    res.locals.user = user;
+
+                    next();
+                } catch (error) {
+                    console.error('Error fetching user:', error);
+                    res.locals.user = null;
+                    next();
+                }
             }
         });
     } else {
+        // If token does not exist, set res.locals.user to null
         res.locals.user = null;
         next();
     }
-}
+};
 
-export default { requireAuth, checkUser };
+export { requireAuth, checkUser };

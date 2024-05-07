@@ -8,13 +8,18 @@ const cors_1 = __importDefault(require("cors"));
 const postController_1 = require("../controllers/postController");
 // Create a new router
 const router = express_1.default.Router();
-// Enable CORS for all routes
 router.use((0, cors_1.default)());
-// Get post by ID
-router.get('/getPosts', postController_1.getPostById);
+router.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 // Get Recent Posts
 router.get('/getRecentPosts', postController_1.getRecentPosts);
+router.get('/getPostById', postController_1.getPostById);
 // Update post by ID
-router.put('/api/updatePostById', postController_1.updatePostById);
+router.put('/updatePostById', postController_1.updatePostById);
 exports.default = router;
 //# sourceMappingURL=postRoutes.js.map

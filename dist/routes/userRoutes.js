@@ -4,21 +4,48 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const userController_1 = require("../controllers/userController");
 const cors_1 = __importDefault(require("cors"));
-const authMiddleware_1 = require("../middleware/authMiddleware");
-const authenticateCon_1 = require("../controllers/authenticateCon");
-const authController_1 = require("../controllers/authController");
+const UserModel_1 = __importDefault(require("../utils/models/UserModel"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const router = express_1.default.Router();
-// Enable CORS for all routes
 router.use((0, cors_1.default)());
-// Define the route for user login with JWT authentication middleware
-router.post('/api/login', authenticateCon_1.handleLogin);
-// Define the route for getting the current user with JWT authentication middleware
-router.get('/api/getCurrentUser', authenticateCon_1.authenticateToken, authenticateCon_1.handleCurrentUser);
-// Define route for refreshToken
-router.post('/api/refreshToken', authController_1.refreshToken);
-// Define the route for user logout with JWT authentication middleware
-router.post('/api/logoutUser', authMiddleware_1.authenticate, userController_1.logoutUser);
+router.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+});
+// Define a route to fetch user data
+router.get('/currentUser', async (req, res) => {
+    try {
+        // verify the token
+        const token = req.headers.authorization?.split(' ')[1]; // Add a check for undefined
+        if (token) {
+            const decoded = jsonwebtoken_1.default.verify(token, 'metal ninja secret');
+            const user = await UserModel_1.default.findByPk(decoded.UserID);
+            if (user) {
+                req.currentUser = user;
+            }
+            else {
+                console.error('user not found');
+                res.status(401).send({ error: 'Unauthorized' });
+                return;
+            }
+        }
+        const userId = req.body; // Convert userId to a number
+        const user = await UserModel_1.default.findOne(userId);
+        if (user) {
+            res.json(user);
+        }
+        else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    }
+    catch (error) {
+        console.error('Error fetching user:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
 exports.default = router;
 //# sourceMappingURL=userRoutes.js.map

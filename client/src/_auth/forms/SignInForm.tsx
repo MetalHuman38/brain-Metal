@@ -14,7 +14,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from "react-router-dom";
 
 
-
 const SignInForm = () => {
 
   const { isUserLoading } = useUserContext();
@@ -35,6 +34,13 @@ const SignInForm = () => {
   async function onSubmit(values: z.infer<typeof SignInValidation>) {
     try {
       const user = await instance.post("/handleLoginAuth", values);
+      if(user.data.token){
+
+        console.log(user);
+
+        localStorage.setItem('token', user.data.token);
+        localStorage.setItem('user', JSON.stringify(user.data.user));
+      }
       if (!user) {
         return toast({
           title: "Sign in failed. Please try again.",
